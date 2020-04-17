@@ -1,0 +1,41 @@
+FROM ubuntu:18.04
+MAINTAINER YOSHIFUMI sumida <yoshifumi.sumida@gmail.com>
+
+ARG GIT_TAG=latest
+LABEL name="free5gc" \
+      version="${GIT_TAG}.ubuntu18" \
+      io.k8s.description="Image containing all build dependencies for free5gc."
+
+RUN apt-get update && \
+    apt-get install -y \
+        git=1:2.17.1-1ubuntu0.6 \
+        wget=1.19.4-1ubuntu2.2 \
+        make=4.1-9.1ubuntu1 \
+        cmake=3.10.2-1ubuntu2.18.04.1 && \
+    apt-get clean && \
+    apt-get -y autoremove && \
+    rm -rf /var/lib/{apt,dpkg,cache,log}
+
+# Installing Golang
+ARG GO_VERSION=1.12.9
+
+WORKDIR /root
+RUN wget https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz && \
+    tar -C /usr/local -zxvf go${GO_VERSION}.linux-amd64.tar.gz && \
+    mkdir -p ~/go/{bin,pkg,src}
+
+# Clean Up Binaries already exist and Installing Free5gc
+ARG FREE5GC_VERSION=v3.0.0
+ARG FREE5GC_GIT=https://github.com/free5gc/free5gc
+
+ENV GOPATH=/root/go/
+ENV GOROOT=/usr/local/go
+ENV PATH=$PATH:$GOPATH/bin:$GOROOT/bin
+ENV GO111MODULE=off
+
+WORKDIR /root
+RUN git clone -b ${FREE5GC_VERSION} --depth 1 ${FREE5GC_GIT} ${GOPATH}/src/free5gc && \
+    cd $GOPATH/src/free5gc && \
+    rm -rf bin/* && \
+    ./install_env.sh && \
+    ./build.sh
