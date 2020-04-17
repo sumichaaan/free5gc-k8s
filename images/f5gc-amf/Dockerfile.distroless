@@ -1,9 +1,16 @@
 FROM local/f5gc:ubt18 AS builder
 MAINTAINER YOSHIFUMI sumida <yoshifumi.sumida@gmail.com>
 
+
 FROM gcr.io/distroless/base:debug
-COPY --from=builder /root/go/src/free5gc/bin/amf /opt/f5gc/bin/amf
-COPY configs /opt/f5gc/etc/
-ENV PATH ${PATH}:/opt/f5gc/bin
+
+ENV APP_ROOT=/opt/f5gc
+ENV FREE5GC_BUILD_ROOT=/root/go/src/free5gc
+ENV PATH=${APP_ROOT}:${APP_ROOT}/bin:${PATH} HOME=${APP_ROOT}
+
+COPY --from=builder ${FREE5GC_BUILD_ROOT}/bin/amf ${APP_ROOT}/bin/amf
+COPY configs ${APP_ROOT}/etc/
+
+WORKDIR ${APP_ROOT}
 
 ENTRYPOINT ["amf", "--amfcfg", "/opt/f5gc/etc/amfcfg.conf"]

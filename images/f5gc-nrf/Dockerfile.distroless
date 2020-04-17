@@ -8,9 +8,9 @@ ENV APP_ROOT=/opt/f5gc
 ENV FREE5GC_BUILD_ROOT=/root/go/src/free5gc
 ENV PATH=${APP_ROOT}:${APP_ROOT}/bin:${PATH} HOME=${APP_ROOT}
 
-COPY --from=builder ${FREE5GC_BUILD_ROOT}/bin/ausf ${APP_ROOT}/bin/ausf
+COPY --from=builder ${FREE5GC_BUILD_ROOT}/bin/nrf ${APP_ROOT}/bin/nrf
 COPY configs ${APP_ROOT}/etc/
 
 WORKDIR ${APP_ROOT}
 
-ENTRYPOINT ["ausf", "--ausfcfg", "/opt/f5gc/etc/ausfcfg.conf"]
+ENTRYPOINT ["nrf", "--nrfcfg", "/opt/f5gc/etc/nrfcfg.conf"]
