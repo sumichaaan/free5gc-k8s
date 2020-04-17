@@ -16,7 +16,7 @@ RUN apt-get update && \
         libtool=2.4.6-2 \
         libyaml-dev=0.1.7-2ubuntu3 \
         make=4.1-9.1ubuntu1 \
-        pkg-confi=0.29.1-0ubuntu2 \
+        pkg-config=0.29.1-0ubuntu2 \
         wget=1.19.4-1ubuntu2.2 && \
     apt-get clean && \
     apt-get -y autoremove && \
