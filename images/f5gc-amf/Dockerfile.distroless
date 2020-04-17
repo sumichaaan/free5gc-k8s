@@ -6,4 +6,4 @@ COPY --from=builder /root/go/src/free5gc/bin/amf /opt/f5gc/bin/amf
 COPY configs /opt/f5gc/etc/
 ENV PATH ${PATH}:/opt/f5gc/bin
 
-ENTRYPOINT ["amf", "--amfcfg", "/opt/f5gc/etc/amfcfg.cfg"]
+ENTRYPOINT ["amf", "--amfcfg", "/opt/f5gc/etc/amfcfg.conf"]
