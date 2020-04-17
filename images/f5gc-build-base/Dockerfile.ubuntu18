@@ -28,23 +28,24 @@ ARG GO_VERSION=1.12.9
 WORKDIR /root
 RUN wget https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz && \
     tar -C /usr/local -zxvf go${GO_VERSION}.linux-amd64.tar.gz && \
-    mkdir -p ~/go/{bin,pkg,src}
+    mkdir -p go/bin go/pkg go/src
 
 # Clean Up Binaries already exist and Installing Free5gc
 ARG FREE5GC_VERSION=v3.0.0
 ARG FREE5GC_GIT=https://github.com/free5gc/free5gc
 
-ENV GOPATH=/root/go/
+ENV GOPATH=/root/go
 ENV GOROOT=/usr/local/go
-ENV PATH=$PATH:$GOPATH/bin:$GOROOT/bin
+ENV PATH=${PATH}:${GOPATH}/bin:${GOROOT}/bin
 ENV GO111MODULE=off
 
-WORKDIR /root
+WORKDIR /root/go/src
 COPY patches patches/
 RUN git clone -b ${FREE5GC_VERSION} --depth 1 ${FREE5GC_GIT} ${GOPATH}/src/free5gc && \
-    cd $GOPATH/src/free5gc && \
+    cd free5gc && \
     patch -p1 < /root/patches/additional_build_options.patch && \
     patch -p1 < /root/patches/additional_packages.patch && \
     rm -rf bin/* && \
     ./install_env.sh && \
+    tar -C ${GOPATH} -zxvf free5gc_libs.tar.gz && \
     ./build.sh
