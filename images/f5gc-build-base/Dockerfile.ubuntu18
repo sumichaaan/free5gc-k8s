@@ -43,7 +43,7 @@ WORKDIR /root
 COPY patches patches/
 RUN git clone -b ${FREE5GC_VERSION} --depth 1 ${FREE5GC_GIT} ${GOPATH}/src/free5gc && \
     cd $GOPATH/src/free5gc && \
-    patch -p1 < /root/pathces/additional_build_options.patch && \
+    patch -p1 < /root/patches/additional_build_options.patch && \
     patch -p1 < /root/patches/additional_packages && \
     rm -rf bin/* && \
     ./install_env.sh && \
