@@ -7,7 +7,7 @@ index 40b7993..b4ad5f6 100755
  for NF in ${NF_LIST}; do
      echo "Start build ${NF}...."
 -    go build -o bin/${NF} -x src/${NF}/${NF}.go
-+    go build -tags "netgo" -installsuffix netgo -ldflags="-s -w -extldflags \"-static\"" -o bin/${NF} -x src/${NF}/${NF}.go
++    go build -tags "netgo" -ldflags="-s -w -extldflags \"-static\"" -o bin/${NF} -x src/${NF}/${NF}.go
  done
 
  echo "Start build UPF...."
