@@ -17,6 +17,7 @@ RUN apt-get update && \
         libyaml-dev=0.1.7-2ubuntu3 \
         make=4.1-9.1ubuntu1 \
         pkg-config=0.29.1-0ubuntu2 \
+        upx-ucl=3.94-4 \
         wget=1.19.4-1ubuntu2.2 && \
     apt-get clean && \
     apt-get -y autoremove && \
