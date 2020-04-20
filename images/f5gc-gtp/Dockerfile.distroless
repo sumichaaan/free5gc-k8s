@@ -1,0 +1,24 @@
+FROM local/f5gc:ubt18 AS builder
+MAINTAINER YOSHIFUMI sumida <yoshifumi.sumida@gmail.com>
+
+RUN apt-get update && \
+    apt-get install -y kmod linux-headers-$(uname -r)
+
+WORKDIR /root
+COPY patches patches/
+RUN git clone https://github.com/PrinzOwO/gtp5g.git && \
+    cd gtp5g && \
+    patch -p1 --ignore-whitespace < /root/patches/fix_less_arguments_of_function_pmtu_update.patch && \
+    make -j`nproc`
+
+
+FROM gcr.io/distroless/base:debug
+
+COPY --from=builder /sbin/lsmod /sbin/lsmod
+COPY --from=builder /sbin/insmod /sbin/insmod
+COPY --from=builder /root/gtp5g/gtp5g.ko /root/gtp5g/gtp5g.ko
+
+WORKDIR /root
+COPY scripts scripts/
+
+ENTRYPOINT ["sh", "/root/scripts/entrypoint.sh"]
