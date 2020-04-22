@@ -1,0 +1,7 @@
+resources:
+ - 00_mongodb-service.yaml
+ - 01_mongodb-configmap.yaml
+ - 02_mongodb-f5gc-db.yaml
+ - 03_mongodb-statefulset.yaml
+
+namespace: oai
