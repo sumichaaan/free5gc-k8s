@@ -1,0 +1,19 @@
+resources:
+  - 00_nssf-sa.yaml
+  - 01_nssf-rbac.yaml
+  - 02_configmap.yaml
+  - 03_service.yaml
+#  - 04_multus.yaml
+  - 05_deployment.yaml
+
+namespace: f5gc
+
+secretGenerator:
+- name: nssf-tls-secret
+  namespace: default
+  files:
+  - certs/nssf.pem
+  - certs/nssf.key
+  type: "Opaque"
+generatorOptions:
+  disableNameSuffixHash: true

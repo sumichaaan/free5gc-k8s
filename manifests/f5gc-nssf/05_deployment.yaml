@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f5gc-nssf
+  labels:
+    app: f5gc-nssf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5gc-nssf
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: f5gc-nssf
+      annotations:
+        k8s.v1.cni.cncf.io/networks: nssf-net1
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+        - name: nssf
+          image: sumichaaan/f5gc-nssf:latest
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: certs
+              mountPath: /opt/f5gc-nssf/certs
+          ports:
+            - containerPort: 29531
+              name: f5gc-nssf
+          env:
+            - name: MONGODB_IP
+              valueFrom:
+                configMapKeyRef:
+                  name: nssf-config
+                  key: mongodb_ip
+        - name: tcpdump
+          image: corfr/tcpdump
+          command:
+            - /bin/sleep
+            - infinity
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: nssf-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: certs
+          secret:
+            secretName: nssf-tls-secret
