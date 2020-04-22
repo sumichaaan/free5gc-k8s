@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f5gc-udm
+  labels:
+    app: f5gc-udm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5gc-udm
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: f5gc-udm
+      annotations:
+        k8s.v1.cni.cncf.io/networks: udm-net1
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+        - name: udm
+          image: sumichaaan/f5gc-udm:latest
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: certs
+              mountPath: /opt/f5gc-udm/certs
+          ports:
+            - containerPort: 29503
+              name: f5gc-udm
+          env:
+            - name: MONGODB_IP
+              valueFrom:
+                configMapKeyRef:
+                  name: udm-config
+                  key: mongodb_ip
+        - name: tcpdump
+          image: corfr/tcpdump
+          command:
+            - /bin/sleep
+            - infinity
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: udm-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: certs
+          secret:
+            secretName: udm-tls-secret
