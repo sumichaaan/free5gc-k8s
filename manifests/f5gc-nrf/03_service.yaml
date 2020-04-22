@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: f5gc-nrf
+  name: f5gc-nrf
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: f5gc-nrf
+    port: 29510
+    protocol: TCP
+    targetPort: 29510
+  selector:
+    app: f5gc-nrf
