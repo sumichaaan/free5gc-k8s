@@ -1,0 +1,19 @@
+resources:
+  - 00_smf-sa.yaml
+  - 01_smf-rbac.yaml
+  - 02_configmap.yaml
+  - 03_service.yaml
+#  - 04_multus.yaml
+  - 05_deployment.yaml
+
+namespace: f5gc
+
+secretGenerator:
+- name: smf-tls-secret
+  namespace: default
+  files:
+  - certs/smf.pem
+  - certs/smf.key
+  type: "Opaque"
+generatorOptions:
+  disableNameSuffixHash: true

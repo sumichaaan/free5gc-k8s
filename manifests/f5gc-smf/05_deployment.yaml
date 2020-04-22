@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f5gc-smf
+  labels:
+    app: f5gc-smf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5gc-smf
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: f5gc-smf
+      annotations:
+        k8s.v1.cni.cncf.io/networks: smf-net1
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+        - name: smf
+          image: sumichaaan/f5gc-smf:latest
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: certs
+              mountPath: /opt/f5gc-smf/certs
+          ports:
+            - containerPort: 29502
+              name: f5gc-smf
+          env:
+            - name: MONGODB_IP
+              valueFrom:
+                configMapKeyRef:
+                  name: smf-config
+                  key: mongodb_ip
+        - name: tcpdump
+          image: corfr/tcpdump
+          command:
+            - /bin/sleep
+            - infinity
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: smf-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: certs
+          secret:
+            secretName: smf-tls-secret
