@@ -1,44 +1,44 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: f5gc-nrf
+  name: f5gc-amf
   labels:
-    app: f5gc-nrf
+    app: f5gc-amf
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: f5gc-nrf
+      app: f5gc-amf
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: f5gc-nrf
+        app: f5gc-amf
       annotations:
-        k8s.v1.cni.cncf.io/networks: nrf-net1
+        k8s.v1.cni.cncf.io/networks: amf-net1
     spec:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
       containers:
-        - name: nrf
-          image: sumichaaan/f5gc-nrf:latest
+        - name: amf
+          image: sumichaaan/f5gc-amf:latest
           imagePullPolicy: Always
           securityContext:
             privileged: true
           volumeMounts:
             - name: certs
-              mountPath: /opt/f5gc-nrf/certs
+              mountPath: /opt/f5gc-amf/certs
           ports:
-            - containerPort: 29510
-              name: f5gc-nrf
-          env:
-            - name: MONGODB_IP
-              valueFrom:
-                configMapKeyRef:
-                  name: nrf-config
-                  key: mongodb_ip
+            - containerPort: 29518
+              name: f5gc-amf
+          # env:
+          #   - name: MONGODB_IP
+          #     valueFrom:
+          #       configMapKeyRef:
+          #         name: amf-config
+          #         key: mongodb_ip
         - name: tcpdump
           image: corfr/tcpdump
           command:
@@ -47,9 +47,9 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      serviceAccountName: nrf-sa
+      serviceAccountName: amf-sa
       terminationGracePeriodSeconds: 30
       volumes:
         - name: certs
           secret:
-            secretName: nrf-tls-secret
+            secretName: amf-tls-secret

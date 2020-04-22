@@ -1,6 +1,6 @@
 resources:
-  - 00_nrf-sa.yaml
-  - 01_nrf-rbac.yaml
+  - 00_amf-sa.yaml
+  - 01_amf-rbac.yaml
   - 02_configmap.yaml
   - 03_service.yaml
 #  - 04_multus.yaml
@@ -9,11 +9,11 @@ resources:
 namespace: f5gc
 
 secretGenerator:
-- name: nrf-tls-secret
+- name: amf-tls-secret
   namespace: default
   files:
-  - certs/nrf.pem
-  - certs/nrf.key
+  - certs/amf.pem
+  - certs/amf.key
   type: "Opaque"
 generatorOptions:
   disableNameSuffixHash: true
