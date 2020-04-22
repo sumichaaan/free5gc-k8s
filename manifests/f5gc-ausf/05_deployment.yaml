@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f5gc-ausf
+  labels:
+    app: f5gc-ausf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5gc-ausf
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: f5gc-ausf
+      annotations:
+        k8s.v1.cni.cncf.io/networks: ausf-net1
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+        - name: ausf
+          image: sumichaaan/f5gc-ausf:latest
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: certs
+              mountPath: /opt/f5gc-ausf/certs
+          ports:
+            - containerPort: 29509
+              name: f5gc-ausf
+          # env:
+          #   - name: MONGODB_IP
+          #     valueFrom:
+          #       configMapKeyRef:
+          #         name: ausf-config
+          #         key: mongodb_ip
+        - name: tcpdump
+          image: corfr/tcpdump
+          command:
+            - /bin/sleep
+            - infinity
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: ausf-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: certs
+          secret:
+            secretName: ausf-tls-secret

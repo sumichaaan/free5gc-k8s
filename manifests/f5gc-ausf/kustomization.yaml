@@ -1,0 +1,19 @@
+resources:
+  - 00_ausf-sa.yaml
+  - 01_ausf-rbac.yaml
+  - 02_configmap.yaml
+  - 03_service.yaml
+#  - 04_multus.yaml
+  - 05_deployment.yaml
+
+namespace: f5gc
+
+secretGenerator:
+- name: ausf-tls-secret
+  namespace: default
+  files:
+  - certs/ausf.pem
+  - certs/ausf.key
+  type: "Opaque"
+generatorOptions:
+  disableNameSuffixHash: true
