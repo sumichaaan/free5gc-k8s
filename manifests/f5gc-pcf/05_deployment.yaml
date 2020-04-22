@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f5gc-pcf
+  labels:
+    app: f5gc-pcf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5gc-pcf
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: f5gc-pcf
+      annotations:
+        k8s.v1.cni.cncf.io/networks: pcf-net1
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+        - name: pcf
+          image: sumichaaan/f5gc-pcf:latest
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: certs
+              mountPath: /opt/f5gc-pcf/certs
+          ports:
+            - containerPort: 29507
+              name: f5gc-pcf
+          env:
+            - name: MONGODB_IP
+              valueFrom:
+                configMapKeyRef:
+                  name: pcf-config
+                  key: mongodb_ip
+        - name: tcpdump
+          image: corfr/tcpdump
+          command:
+            - /bin/sleep
+            - infinity
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: pcf-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: certs
+          secret:
+            secretName: pcf-tls-secret

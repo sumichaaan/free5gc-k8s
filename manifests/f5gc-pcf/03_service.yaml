@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: f5gc-pcf
+  name: f5gc-pcf
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: f5gc-pcf
+    port: 29507
+    protocol: TCP
+    targetPort: 29507
+  selector:
+    app: f5gc-pcf

@@ -1,0 +1,19 @@
+resources:
+  - 00_pcf-sa.yaml
+  - 01_pcf-rbac.yaml
+  - 02_configmap.yaml
+  - 03_service.yaml
+#  - 04_multus.yaml
+  - 05_deployment.yaml
+
+namespace: f5gc
+
+secretGenerator:
+- name: pcf-tls-secret
+  namespace: default
+  files:
+  - certs/pcf.pem
+  - certs/pcf.key
+  type: "Opaque"
+generatorOptions:
+  disableNameSuffixHash: true
