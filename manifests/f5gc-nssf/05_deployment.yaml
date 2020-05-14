@@ -28,17 +28,16 @@ spec:
           securityContext:
             privileged: true
           volumeMounts:
+            - name: nssfcfg
+              mountPath: /opt/f5gc/etc
+            - name: free5gccfg
+              mountPath: /opt/config
             - name: certs
-              mountPath: /opt/f5gc-nssf/certs
+              mountPath: /opt/support/TLS
           ports:
             - containerPort: 29531
               name: f5gc-nssf
-          env:
-            - name: MONGODB_IP
-              valueFrom:
-                configMapKeyRef:
-                  name: nssf-config
-                  key: mongodb_ip
+              protocol: TCP
         - name: tcpdump
           image: corfr/tcpdump
           command:
@@ -53,3 +52,15 @@ spec:
         - name: certs
           secret:
             secretName: nssf-tls-secret
+        - name: nssfcfg
+          configMap:
+            name: nssf-config
+            items:
+            - key: nssfcfg.conf
+              path: nssfcfg.conf
+        - name: free5gccfg
+          configMap:
+            name: nssf-config
+            items:
+            - key: free5GC.conf
+              path: free5GC.conf
