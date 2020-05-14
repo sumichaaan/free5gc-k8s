@@ -1,15 +1,19 @@
 FROM local/f5gc:ubt18 AS builder
-MAINTAINER YOSHIFUMI sumida <yoshifumi.sumida@gmail.com>
+LABEL maintainer "sumichaaan <yoshifumi.sumida@gmail.com>"
 
 
 FROM gcr.io/distroless/base:debug
 
+ENV APP_OPT=/opt
 ENV APP_ROOT=/opt/f5gc
 ENV FREE5GC_BUILD_ROOT=/root/go/src/free5gc
 ENV PATH=${APP_ROOT}:${APP_ROOT}/bin:${PATH} HOME=${APP_ROOT}
 
 COPY --from=builder ${FREE5GC_BUILD_ROOT}/bin/nssf ${APP_ROOT}/bin/nssf
 COPY configs ${APP_ROOT}/etc/
+
+# Directory Path of Common Configuration free5GC.conf can not be changed for a bit reason.
+COPY configs ${APP_OPT}/config/
 
 WORKDIR ${APP_ROOT}
 
