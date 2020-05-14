@@ -6,7 +6,7 @@ resources:
 #  - 04_multus.yaml
   - 05_deployment.yaml
 
-namespace: f5gc
+namespace: nrpj
 
 secretGenerator:
 - name: nrf-tls-secret

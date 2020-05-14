@@ -28,17 +28,16 @@ spec:
           securityContext:
             privileged: true
           volumeMounts:
+            - name: nrfcfg
+              mountPath: /opt/f5gc/etc
+            - name: free5gccfg
+              mountPath: /opt/config
             - name: certs
-              mountPath: /opt/f5gc-nrf/certs
+              mountPath: /opt/support/TLS
           ports:
             - containerPort: 29510
               name: f5gc-nrf
-          env:
-            - name: MONGODB_IP
-              valueFrom:
-                configMapKeyRef:
-                  name: nrf-config
-                  key: mongodb_ip
+              protocol: TCP
         - name: tcpdump
           image: corfr/tcpdump
           command:

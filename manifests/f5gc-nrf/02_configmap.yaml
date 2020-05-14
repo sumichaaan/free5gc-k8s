@@ -3,4 +3,9 @@ kind: ConfigMap
 metadata:
   name: nrf-config
 data:
-  # Test
+  MONGODB_IP: "f5gc-mongodb-0.f5gc-mongodb.nrpj.svc.cluster.local"
+  MONGODB_PORT: "27017"
+  DEFAULT_SERVICE_IP: "0.0.0.0"
+  SBI_IP: "0.0.0.0"
+  MCC: "208"
+  MNC: "93"
