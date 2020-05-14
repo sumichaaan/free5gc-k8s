@@ -52,3 +52,15 @@ spec:
         - name: certs
           secret:
             secretName: nrf-tls-secret
+        - name: nrfcfg
+          configMap:
+            name: nrf-config
+            items: 
+            - key: nrfcfg.conf
+              path: nrfcfg.conf
+        - name: free5gccfg
+          configMap:
+            name: nrf-config
+            items: 
+            - key: free5GC.conf
+              path: free5GC.conf
