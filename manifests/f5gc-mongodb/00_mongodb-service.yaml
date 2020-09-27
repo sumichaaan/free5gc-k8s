@@ -6,24 +6,7 @@ metadata:
     app: f5gc-mongodb
   name: f5gc-mongodb-headless
 spec:
-  clusterIP: None
-  ports:
-  - name: f5gc-mongodb
-    port: 27017
-    targetPort: 27017
-    protocol: TCP
-  selector:
-    app: f5gc-mongodb
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: f5gc-mongodb
-  name: f5gc-mongodb-nodeport
-spec:
-  type: NodePort
+  type: ClusterIP
   ports:
   - name: f5gc-mongodb
     port: 27017
