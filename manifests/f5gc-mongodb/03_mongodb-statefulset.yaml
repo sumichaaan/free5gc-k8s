@@ -18,7 +18,7 @@ spec:
         runAsGroup: 0
       containers:
       - name: mongodb
-        image: mongo:4.2.0
+        image: mongo:4.2.7
         ports:
         - containerPort: 27017
           name: mongodb
@@ -26,5 +26,5 @@ spec:
           - name: MONGO_INITDB_DATABASE
             valueFrom:
               configMapKeyRef:
-                name: mongodb-config
+                name: f5gc-mongodb-config
                 key: mongo_initdb_database

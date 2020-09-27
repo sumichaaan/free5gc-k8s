@@ -4,4 +4,4 @@ resources:
  - 02_mongodb-f5gc-db.yaml
  - 03_mongodb-statefulset.yaml
 
-namespace: oai
+namespace: free5gc

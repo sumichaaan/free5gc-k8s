@@ -1,6 +1,6 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: f5gc-db
+  name: f5gc-mongodb-data
 data:
   # Test
