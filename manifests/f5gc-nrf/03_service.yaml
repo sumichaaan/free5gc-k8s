@@ -6,7 +6,6 @@ metadata:
   name: f5gc-nrf
 spec:
   type: ClusterIP
-  clusterIP: None
   ports:
   - name: f5gc-nrf
     port: 29510
