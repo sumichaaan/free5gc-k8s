@@ -1,5 +1,6 @@
 FROM ubuntu:18.04
-MAINTAINER YOSHIFUMI sumida <yoshifumi.sumida@gmail.com>
+
+LABEL maintainer="Yoshifumi Sumida <yoshifumi.sumida@gmail.com>"
 
 ARG GIT_TAG=latest
 LABEL name="free5gc" \
@@ -23,29 +24,46 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Installing Golang
-ARG GO_VERSION=1.12.9
+ARG GO_VERSION=1.14.4
 
-WORKDIR /root
+WORKDIR /go
 RUN wget https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz && \
     tar -C /usr/local -zxvf go${GO_VERSION}.linux-amd64.tar.gz && \
-    mkdir -p go/bin go/pkg go/src
+    mkdir -p {bin,pkg,src}
 
-# Clean Up Binaries already exist and Installing Free5gc
-ARG FREE5GC_VERSION=v3.0.0
-ARG FREE5GC_GIT=https://github.com/free5gc/free5gc
-
-ENV GOPATH=/root/go
+ENV GOPATH=/go
 ENV GOROOT=/usr/local/go
 ENV PATH=${PATH}:${GOPATH}/bin:${GOROOT}/bin
 ENV GO111MODULE=off
 
-WORKDIR /root
+# Clean Up Binaries already exist and Installing Free5gc
+ARG FREE5GC_VERSION=master
+ARG FREE5GC_COMMITID=8c7f82f5288d3973a18a4f5edf22274c4920dc97
+ARG FREE5GC_GIT=https://github.com/free5gc/free5gc
+
+WORKDIR /go/src
 COPY patches patches/
-RUN git clone -b ${FREE5GC_VERSION} --depth 1 ${FREE5GC_GIT} ${GOPATH}/src/free5gc && \
-    cd ${GOPATH}/src/free5gc && \
-    patch -p1 < /root/patches/additional_build_options.patch && \
-    patch -p1 < /root/patches/additional_packages.patch && \
-    rm -rf bin/* && \
-    ./install_env.sh && \
-    tar -C ${GOPATH} -zxvf free5gc_libs.tar.gz && \
-    ./build.sh
+RUN set -o pipefail && \
+    ;
+    echo '[*] Build the Network Functions for Contorl Plane' && \
+    ;
+    git clone --recursive -b ${FREE5GC_VERSION} -j 4 --depth 1 ${FREE5GC_GIT} && \
+    cd ./free5gc && \
+    git checkout ${FREE5GC_COMMITID} && \
+    cd ./src && \
+    go mod download && \
+    for d in * ; do if [ -f "$d/$d.go" ] ; then CGO_ENABLED=0 go build -a -installsuffix nocgo -o ../bin/"$d" -x "$d/$d.go" ; fi ; done ; && \
+    ;
+    echo '[*] Build the Network Function for User Plane' && \
+    ;
+    go get -u -v "github.com/sirupsen/logrus" && \
+    cd ${GOPATH}/src/free5gc/src/upf && \
+    mkdir -p build && \ 
+    cd ./build && \
+    cmake .. && \
+    make -j `nproc` && \
+    ;
+    echo '[*] Build the Web Console for Free5GC Operation' && \
+    ;
+    cd ${GOPATH}/src/free5gc/webconsole && \
+    CGO_ENABLED=0 go build -a -installsuffix nocgo -o webui -x server.go && \

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: nrf-config
+  name: f5gc-nrf-config
 data:
 
   nrfcfg.conf: |
@@ -11,16 +11,12 @@ data:
     
     configuration:
       MongoDBName: "free5gc"
-      MongoDBUrl: "mongodb://f5gc-mongodb:27017"
-      DefaultServiceIP: "0.0.0.0"
+      MongoDBUrl: "mongodb://f5gc-mongodb-headless:27017"
+      DefaultServiceIP: "f5gc-nrf"
       sbi:
         scheme: https
         ipv4Addr: 0.0.0.0
         port: 29510
-        tls:
-          log: ../log/nrfsslkey.log
-          key: ../support/TLS/nrf.key
-          pem: ../support/TLS/nrf.pem
       DefaultPlmnId:
         mcc: "208"
         mnc: "93"
@@ -87,7 +83,7 @@ data:
         debugLevel: info
         ReportCaller: true
       OpenApi:
-        debugLevel: info
+        debugLevel: debug
         ReportCaller: true
       Aper:
         debugLevel: info

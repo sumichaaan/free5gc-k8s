@@ -15,25 +15,25 @@ spec:
     metadata:
       labels:
         app: f5gc-nrf
-      annotations:
-        k8s.v1.cni.cncf.io/networks: nrf-net1
     spec:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
       containers:
-        - name: nrf
-          image: sumichaaan/f5gc-nrf:latest
-          imagePullPolicy: Always
+        - name: f5gc-nrf
+          image: local/f5gc-nrf:master
+          imagePullPolicy: IfNotPresent
+          # imagePullPolicy: Always
           securityContext:
-            privileged: true
+            privileged: false
           volumeMounts:
-            - name: nrfcfg
-              mountPath: /opt/f5gc/etc
-            - name: free5gccfg
-              mountPath: /opt/config
+            - name: f5gc-nrf-config
+              mountPath: /free5gc/config
+            # - name: f5gc-free5gccfg
+            #   mountPath: /free5gc/config/
+            #   subPath: free5GC.conf
             - name: certs
-              mountPath: /opt/support/TLS
+              mountPath: /free5gc/support/TLS
           ports:
             - containerPort: 29510
               name: f5gc-nrf
@@ -46,21 +46,21 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      serviceAccountName: nrf-sa
+      serviceAccountName: f5gc-nrf-sa
       terminationGracePeriodSeconds: 30
       volumes:
         - name: certs
           secret:
-            secretName: nrf-tls-secret
-        - name: nrfcfg
+            secretName: f5gc-nrf-tls-secret
+        - name: f5gc-nrf-config
           configMap:
-            name: nrf-config
-            items: 
-            - key: nrfcfg.conf
-              path: nrfcfg.conf
-        - name: free5gccfg
-          configMap:
-            name: nrf-config
-            items: 
-            - key: free5GC.conf
-              path: free5GC.conf
+            name: f5gc-nrf-config
+        #     items: 
+        #     - key: nrfcfg.conf
+        #       path: nrfcfg.conf
+        # - name: f5gc-free5gccfg
+        #   configMap:
+        #     name: f5gc-nrf-config
+        #     items: 
+        #     - key: free5GC.conf
+        #       path: free5GC.conf

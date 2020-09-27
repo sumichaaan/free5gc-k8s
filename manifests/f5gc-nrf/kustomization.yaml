@@ -3,13 +3,12 @@ resources:
   - 01_nrf-rbac.yaml
   - 02_configmap.yaml
   - 03_service.yaml
-#  - 04_multus.yaml
-  - 05_deployment.yaml
+  - 04_deployment.yaml
 
-namespace: nrpj
+namespace: free5gc
 
 secretGenerator:
-- name: nrf-tls-secret
+- name: f5gc-nrf-tls-secret
   namespace: default
   files:
   - certs/nrf.pem

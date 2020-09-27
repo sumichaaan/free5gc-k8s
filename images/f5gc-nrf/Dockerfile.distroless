@@ -1,20 +1,21 @@
-FROM local/f5gc:ubt18 AS builder
-LABEL maintainer "sumichaaan <yoshifumi.sumida@gmail.com>"
-
+FROM local/f5gc-build-base:master AS builder
+LABEL maintainer="Yoshifumi Sumida <yoshifumi.sumida@gmail.com>"
 
 FROM gcr.io/distroless/base:debug
 
-ENV APP_OPT=/opt
-ENV APP_ROOT=/opt/f5gc
-ENV FREE5GC_BUILD_ROOT=/root/go/src/free5gc
+ENV APP_NAME=nrf
+ENV APP_ROOT=/free5gc
+ENV FREE5GC_BUILD_ROOT=/go/src/free5gc
 ENV PATH=${APP_ROOT}:${APP_ROOT}/bin:${PATH} HOME=${APP_ROOT}
 
-COPY --from=builder ${FREE5GC_BUILD_ROOT}/bin/nrf ${APP_ROOT}/bin/nrf
-COPY configs ${APP_ROOT}/etc/
-
-# Directory Path of Common Configuration free5GC.conf can not be changed for a bit reason.
-COPY configs ${APP_OPT}/config/
+COPY --from=builder ${FREE5GC_BUILD_ROOT}/bin/${APP_NAME} ${APP_ROOT}/bin/${APP_NAME}
+COPY --from=builder ${FREE5GC_BUILD_ROOT}/config/${APP_NAME}cfg.conf ${APP_ROOT}/config/
+COPY --from=builder ${FREE5GC_BUILD_ROOT}/support/TLS/${APP_NAME}.* ${APP_ROOT}/support/TLS/
 
 WORKDIR ${APP_ROOT}
 
-ENTRYPOINT ["nrf", "--nrfcfg", "/opt/f5gc/etc/nrfcfg.conf"]
+VOLUME ["/free5gc/config"]
+
+VOLUME ["/free5gc/support/TLS"]
+
+ENTRYPOINT ["bin/nrf"]
