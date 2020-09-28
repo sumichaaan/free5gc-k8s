@@ -6,11 +6,11 @@ resources:
 #  - 04_multus.yaml
   - 05_deployment.yaml
 
-namespace: f5gc
+namespace: free5gc
 
 secretGenerator:
 - name: smf-tls-secret
-  namespace: default
+  namespace: free5gc
   files:
   - certs/smf.pem
   - certs/smf.key

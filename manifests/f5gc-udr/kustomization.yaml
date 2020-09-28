@@ -9,7 +9,7 @@ namespace: free5gc
 
 secretGenerator:
 - name: f5gc-udr-tls-secret
-  namespace: default
+  namespace: free5gc
   files:
   - cert/udr.pem
   - cert/udr.key

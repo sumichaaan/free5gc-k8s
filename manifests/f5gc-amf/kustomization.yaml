@@ -10,7 +10,7 @@ namespace: free5gc
 
 secretGenerator:
 - name: f5gc-amf-tls-secret
-  namespace: default
+  namespace: free5gc
   files:
   - cert/amf.pem
   - cert/amf.key

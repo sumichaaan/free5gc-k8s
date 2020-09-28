@@ -9,7 +9,7 @@ namespace: free5gc
 
 secretGenerator:
 - name: f5gc-nrf-tls-secret
-  namespace: default
+  namespace: free5gc
   files:
   - cert/nrf.pem
   - cert/nrf.key

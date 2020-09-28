@@ -22,23 +22,21 @@ spec:
         runAsUser: 0
         runAsGroup: 0
       containers:
-        - name: pcf
-          image: sumichaaan/f5gc-pcf:latest
-          imagePullPolicy: Always
+        - name: f5gc-pcf
+          image: local/f5gc-pcf:master
+          imagePullPolicy: IfNotPresent
+          # imagePullPolicy: Always
           securityContext:
-            privileged: true
+            privileged: false
           volumeMounts:
-            - name: certs
-              mountPath: /opt/f5gc-pcf/certs
+            - name: f5gc-pcf-config
+              mountPath: /free5gc/config
+            - name: f5gc-pcf-cert
+              mountPath: /free5gc/support/TLS
           ports:
             - containerPort: 29507
               name: f5gc-pcf
-          env:
-            - name: MONGODB_IP
-              valueFrom:
-                configMapKeyRef:
-                  name: pcf-config
-                  key: mongodb_ip
+              protocol: TCP
         - name: tcpdump
           image: corfr/tcpdump
           command:
@@ -47,9 +45,12 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      serviceAccountName: pcf-sa
+      serviceAccountName: f5gc-pcf-sa
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: certs
+        - name: f5gc-pcf-cert
           secret:
-            secretName: pcf-tls-secret
+            secretName: f5gc-pcf-tls-secret
+        - name: f5gc-pcf-config
+          configMap:
+            name: f5gc-pcf-config
