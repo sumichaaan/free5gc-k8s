@@ -29,10 +29,7 @@ spec:
           volumeMounts:
             - name: f5gc-nrf-config
               mountPath: /free5gc/config
-            # - name: f5gc-free5gccfg
-            #   mountPath: /free5gc/config/
-            #   subPath: free5GC.conf
-            - name: certs
+            - name: f5gc-nrf-cert
               mountPath: /free5gc/support/TLS
           ports:
             - containerPort: 29510
@@ -49,18 +46,9 @@ spec:
       serviceAccountName: f5gc-nrf-sa
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: certs
+        - name: f5gc-nrf-cert
           secret:
             secretName: f5gc-nrf-tls-secret
         - name: f5gc-nrf-config
           configMap:
             name: f5gc-nrf-config
-        #     items: 
-        #     - key: nrfcfg.conf
-        #       path: nrfcfg.conf
-        # - name: f5gc-free5gccfg
-        #   configMap:
-        #     name: f5gc-nrf-config
-        #     items: 
-        #     - key: free5GC.conf
-        #       path: free5GC.conf

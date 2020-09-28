@@ -16,29 +16,27 @@ spec:
       labels:
         app: f5gc-amf
       annotations:
-        k8s.v1.cni.cncf.io/networks: amf-net1
+        k8s.v1.cni.cncf.io/networks: f5gc-amf-n1n2
     spec:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
       containers:
         - name: amf
-          image: sumichaaan/f5gc-amf:latest
-          imagePullPolicy: Always
+          image: local/f5gc-amf:master
+          imagePullPolicy: IfNotPresent
+          # imagePullPolicy: Always
           securityContext:
-            privileged: true
+            privileged: false
           volumeMounts:
-            - name: certs
-              mountPath: /opt/f5gc-amf/certs
+            - name: f5gc-amf-config
+              mountPath: /free5gc/config
+            - name: f5gc-amf-cert
+              mountPath: /free5gc/f5gc-amf/certs
           ports:
             - containerPort: 29518
               name: f5gc-amf
-          # env:
-          #   - name: MONGODB_IP
-          #     valueFrom:
-          #       configMapKeyRef:
-          #         name: amf-config
-          #         key: mongodb_ip
+              protocol: TCP
         - name: tcpdump
           image: corfr/tcpdump
           command:
@@ -47,9 +45,12 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      serviceAccountName: amf-sa
+      serviceAccountName: f5gc-amf-sa
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: certs
+        - name: f5gc-amf-cert
           secret:
-            secretName: amf-tls-secret
+            secretName: f5gc-amf-tls-secret
+        - name: f5gc-amf-config
+          configMap:
+            name: f5gc-amf-config

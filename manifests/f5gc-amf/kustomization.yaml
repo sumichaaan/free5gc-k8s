@@ -1,19 +1,19 @@
 resources:
   - 00_amf-sa.yaml
   - 01_amf-rbac.yaml
-  - 02_configmap.yaml
-  - 03_service.yaml
-#  - 04_multus.yaml
-  - 05_deployment.yaml
+  - 02_amf-configmap.yaml
+  - 03_amf-service.yaml
+  - 04_amf-multus.yaml
+  - 05_amf-deployment.yaml
 
-namespace: f5gc
+namespace: free5gc
 
 secretGenerator:
-- name: amf-tls-secret
+- name: f5gc-amf-tls-secret
   namespace: default
   files:
-  - certs/amf.pem
-  - certs/amf.key
+  - cert/amf.pem
+  - cert/amf.key
   type: "Opaque"
 generatorOptions:
   disableNameSuffixHash: true

@@ -6,7 +6,6 @@ metadata:
   name: f5gc-amf
 spec:
   type: ClusterIP
-  clusterIP: None
   ports:
   - name: f5gc-amf
     port: 29518

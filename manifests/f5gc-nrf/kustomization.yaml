@@ -11,8 +11,8 @@ secretGenerator:
 - name: f5gc-nrf-tls-secret
   namespace: default
   files:
-  - certs/nrf.pem
-  - certs/nrf.key
+  - cert/nrf.pem
+  - cert/nrf.key
   type: "Opaque"
 generatorOptions:
   disableNameSuffixHash: true

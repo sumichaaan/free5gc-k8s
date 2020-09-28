@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: f5gc-amf-config
+data:
+  amfcfg.conf: |
+    info:
+      version: 1.0.0
+      description: AMF initial local configuration
+    
+    configuration:
+      amfName: AMF
+      ngapIpList:
+        - 172.16.10.11                 # assigned to a second network interface
+      sbi:
+        scheme: https
+        registerIPv4: f5gc-amf         # Can also be a kubernetes service IP or domain name.
+        bindingIPv4: 0.0.0.0           # Can also be an ENV.
+        port: 29518
+      serviceNameList:
+        - namf-comm
+        - namf-evts
+        - namf-mt
+        - namf-loc
+        - namf-oam
+      servedGuamiList:
+        - plmnId:
+            mcc: 208
+            mnc: 93
+          amfId: cafe00
+      supportTaiList:
+        - plmnId:
+            mcc: 208
+            mnc: 93
+          tac: 1
+      plmnSupportList:
+        - plmnId:
+            mcc: 208
+            mnc: 93
+          snssaiList:
+            - sst: 1
+              sd: 010203
+            - sst: 1
+              sd: 112233
+      supportDnnList:
+        - internet
+      nrfUri: https://f5gc-nrf:29510
+      security:
+        integrityOrder:
+          - NIA2
+          # - NIA0
+        cipheringOrder:
+          - NEA0
+          # - NEA2
+      networkName:
+        full: free5GC
+        short: free
+      t3502: 720
+      t3512: 3600
+      non3gppDeregistrationTimer: 1000
+  free5GC.conf: |
+    db_uri: mongodb://f5gc-mongodb/free5GC
+    #all logging levels
+    #panic
+    #fatal
+    #error
+    #warn
+    #info
+    #debug
+    #trace
+    logger:
+    # network function
+      AMF:
+        debugLevel: info
+        ReportCaller: true
+      SMF:
+        debugLevel: info
+        ReportCaller: true
+      UDR:
+        debugLevel: info
+        ReportCaller: true
+      UDM:
+        debugLevel: info
+        ReportCaller: true
+      NRF:
+        debugLevel: info
+        ReportCaller: true
+      PCF:
+        debugLevel: info
+        ReportCaller: true
+      AUSF:
+        debugLevel: info
+        ReportCaller: true
+      N3IWF:
+        debugLevel: info
+        ReportCaller: true
+    # library
+      NAS:
+        debugLevel: info
+        ReportCaller: true
+      FSM:
+        debugLevel: info
+        ReportCaller: true
+      NGAP:
+        debugLevel: info
+        ReportCaller: true
+      NamfComm:
+        debugLevel: info
+        ReportCaller: true
+      NamfEventExposure:
+        debugLevel: info
+        ReportCaller: true
+      NsmfPDUSession:
+        debugLevel: info
+        ReportCaller: true
+      NudrDataRepository:
+        debugLevel: info
+        ReportCaller: true
+      OpenApi:
+        debugLevel: debug
+        ReportCaller: true
+      Aper:
+        debugLevel: info
+        ReportCaller: true
+      CommonConsumerTest:
+        debugLevel: info
+        ReportCaller: true
+    # webui
+      WEBUI:
+        debugLevel: info
+        ReportCaller: true

@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: amf-sa
+  name: f5gc-amf-sa
