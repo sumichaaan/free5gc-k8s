@@ -6,7 +6,6 @@ metadata:
   name: f5gc-udm
 spec:
   type: ClusterIP
-  clusterIP: None
   ports:
   - name: f5gc-udm
     port: 29503

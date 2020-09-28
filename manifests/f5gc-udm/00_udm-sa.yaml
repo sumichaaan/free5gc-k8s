@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: udm-sa
+  name: f5gc-udm-sa
