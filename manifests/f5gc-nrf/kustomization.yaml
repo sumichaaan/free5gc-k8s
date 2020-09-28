@@ -1,9 +1,9 @@
 resources:
   - 00_nrf-sa.yaml
   - 01_nrf-rbac.yaml
-  - 02_configmap.yaml
-  - 03_service.yaml
-  - 04_deployment.yaml
+  - 02_nrf-configmap.yaml
+  - 03_nrf-service.yaml
+  - 04_nrf-deployment.yaml
 
 namespace: free5gc
 
