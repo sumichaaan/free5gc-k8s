@@ -15,8 +15,6 @@ spec:
     metadata:
       labels:
         app: f5gc-pcf
-      annotations:
-        k8s.v1.cni.cncf.io/networks: pcf-net1
     spec:
       securityContext:
         runAsUser: 0
