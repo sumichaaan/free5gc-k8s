@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f5gc-udr
+  labels:
+    app: f5gc-udr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5gc-udr
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: f5gc-udr
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+        - name: f5gc-udr
+          image: local/f5gc-udr:master
+          imagePullPolicy: IfNotPresent
+          # imagePullPolicy: Always
+          securityContext:
+            privileged: false
+          volumeMounts:
+            - name: f5gc-udr-config
+              mountPath: /free5gc/config
+            - name: f5gc-udr-cert
+              mountPath: /free5gc/support/TLS
+          ports:
+            - containerPort: 29504
+              name: f5gc-udr
+              protocol: TCP
+        - name: tcpdump
+          image: corfr/tcpdump
+          command:
+            - /bin/sleep
+            - infinity
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: f5gc-udr-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: f5gc-udr-cert
+          secret:
+            secretName: f5gc-udr-tls-secret
+        - name: f5gc-udr-config
+          configMap:
+            name: f5gc-udr-config
