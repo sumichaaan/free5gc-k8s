@@ -15,25 +15,22 @@ spec:
     metadata:
       labels:
         app: f5gc-nssf
-      annotations:
-        k8s.v1.cni.cncf.io/networks: nssf-net1
     spec:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
       containers:
-        - name: nssf
-          image: sumichaaan/f5gc-nssf:latest
-          imagePullPolicy: Always
+        - name: f5gc-nssf
+          image: local/f5gc-nssf:master
+          imagePullPolicy: IfNotPresent
+          # imagePullPolicy: Always
           securityContext:
-            privileged: true
+            privileged: false
           volumeMounts:
-            - name: nssfcfg
-              mountPath: /opt/f5gc/etc
-            - name: free5gccfg
-              mountPath: /opt/config
-            - name: certs
-              mountPath: /opt/support/TLS
+            - name: f5gc-nssf-config
+              mountPath: /free5gc/config
+            - name: f5gc-nssf-cert
+              mountPath: /free5gc/support/TLS
           ports:
             - containerPort: 29531
               name: f5gc-nssf
@@ -46,21 +43,12 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      serviceAccountName: nssf-sa
+      serviceAccountName: f5gc-nssf-sa
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: certs
+        - name: f5gc-nssf-cert
           secret:
-            secretName: nssf-tls-secret
-        - name: nssfcfg
+            secretName: f5gc-nssf-tls-secret
+        - name: f5gc-nssf-config
           configMap:
-            name: nssf-config
-            items:
-            - key: nssfcfg.conf
-              path: nssfcfg.conf
-        - name: free5gccfg
-          configMap:
-            name: nssf-config
-            items:
-            - key: free5GC.conf
-              path: free5GC.conf
+            name: f5gc-nssf-config

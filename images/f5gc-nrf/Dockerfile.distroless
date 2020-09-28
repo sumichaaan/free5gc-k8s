@@ -19,3 +19,4 @@ VOLUME ["/free5gc/config"]
 VOLUME ["/free5gc/support/TLS"]
 
 ENTRYPOINT ["bin/nrf"]
+CMD ["-nrfcfg", "config/nrfcfg.conf"]

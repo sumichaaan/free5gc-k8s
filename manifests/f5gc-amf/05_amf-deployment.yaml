@@ -22,7 +22,7 @@ spec:
         runAsUser: 0
         runAsGroup: 0
       containers:
-        - name: amf
+        - name: f5gc-amf
           image: local/f5gc-amf:master
           imagePullPolicy: IfNotPresent
           # imagePullPolicy: Always
@@ -32,7 +32,7 @@ spec:
             - name: f5gc-amf-config
               mountPath: /free5gc/config
             - name: f5gc-amf-cert
-              mountPath: /free5gc/f5gc-amf/certs
+              mountPath: /free5gc/support/TLS
           ports:
             - containerPort: 29518
               name: f5gc-amf
