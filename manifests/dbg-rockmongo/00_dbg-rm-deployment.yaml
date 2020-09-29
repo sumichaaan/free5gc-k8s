@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dbg-rockmongo
+spec:
+  selector:
+     matchLabels:
+       app: dbg-rockmongo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dbg-rockmongo
+    spec:
+      containers:
+      - name: dbg-rockmongo
+        image: tadaweb/rockmongo
+        ports:
+        - containerPort: 8050
+          name: http
+        env:
+        - name: MONGO_HOSTS
+          value: 'f5gc-mongodb:27017'
+        - name: ROCKMONGO_PORT
+          value: '8050'
+        - name: MONGO_HIDE_SYSTEM_COLLECTIONS
+          value: 'false'
+        - name: MONGO_AUTH
+          value: 'false'
+        - name: ROCKMONGO_USER
+          value: 'testadmin'
+        - name: ROCKMONGO_PASSWORD
+          value: 'testadmin'
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: dbg-rockmongo
+  name: dbg-rockmongo
+spec:
+  type: NodePort
+  ports:
+  - name: dbg-rockmongo
+    port: 8050
+    protocol: TCP
+    targetPort: 8050
+  selector:
+    app: dbg-rockmongo

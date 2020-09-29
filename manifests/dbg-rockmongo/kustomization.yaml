@@ -1,0 +1,4 @@
+resources:
+  - 00_dbg-rm-deployment.yaml
+
+namespace: free5gc
