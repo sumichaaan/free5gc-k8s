@@ -1,28 +1,28 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: f5gc-nrf-config
+  name: f5gc-ausf-config
 data:
-
-  nrfcfg.conf: |
+  ausfcfg.conf: |
     info:
       version: 1.0.0
-      description: NRF initial local configuration
+      description: AUSF initial local configuration
     
     configuration:
-      MongoDBName: "free5gc"
-      MongoDBUrl: "mongodb://f5gc-mongodb:27017"
-      DefaultServiceIP: "f5gc-nrf"
       sbi:
         scheme: https
-        ipv4Addr: 0.0.0.0
-        port: 29510
-      DefaultPlmnId:
-        mcc: "208"
-        mnc: "93"
+        registerIPv4: f5gc-ausf     # Can also be a kubernetes service IP or domain name.
+        bindingIPv4: 0.0.0.0      # Can also be an ENV.
+        port: 29509
       serviceNameList:
-        - nnrf-nfm
-        - nnrf-disc
+        - nausf-auth
+      nrfUri: https://f5gc-nrf:29510
+      plmnSupportList:
+        - mcc: 208
+          mnc: 93
+        - mcc: 123
+          mnc: 45
+      groupId: ausfGroup001  
 
   free5GC.conf: |
     db_uri: mongodb://f5gc-mongodb/free5GC

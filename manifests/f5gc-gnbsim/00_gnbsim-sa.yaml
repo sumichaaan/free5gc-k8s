@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: f5gc-ausf-sa
+  name: f5gc-gnbsim-sa

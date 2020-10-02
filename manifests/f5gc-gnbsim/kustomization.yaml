@@ -1,0 +1,9 @@
+resources:
+  - 00_gnbsim-sa.yaml
+  - 01_gnbsim-rbac.yaml
+  - 02_gnbsim-configmap.yaml
+  - 03_gnbsim-service.yaml
+  - 04_gnbsim-multus.yaml
+  - 05_gnbsim-deployment.yaml
+
+namespace: free5gc

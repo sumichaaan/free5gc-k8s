@@ -1,4 +1,4 @@
-FROM local/f5gc-build-base:master AS builder
+FROM local/f5gc-build-base:v3.0.4 AS builder
 FROM alpine:3.8
 
 LABEL description="Free5GC open source 5G Core Network" \

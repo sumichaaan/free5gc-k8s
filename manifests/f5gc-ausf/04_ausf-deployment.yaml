@@ -15,30 +15,26 @@ spec:
     metadata:
       labels:
         app: f5gc-ausf
-      annotations:
-        k8s.v1.cni.cncf.io/networks: ausf-net1
     spec:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
       containers:
-        - name: ausf
-          image: sumichaaan/f5gc-ausf:latest
-          imagePullPolicy: Always
+        - name: f5gc-ausf
+          image: local/f5gc-ausf:master
+          imagePullPolicy: IfNotPresent
+          # imagePullPolicy: Always
           securityContext:
             privileged: true
           volumeMounts:
-            - name: certs
-              mountPath: /opt/f5gc-ausf/certs
+            - name: f5gc-ausf-config
+              mountPath: /free5gc/config
+            - name: f5gc-ausf-cert
+              mountPath: /free5gc/support/TLS
           ports:
             - containerPort: 29509
               name: f5gc-ausf
-          # env:
-          #   - name: MONGODB_IP
-          #     valueFrom:
-          #       configMapKeyRef:
-          #         name: ausf-config
-          #         key: mongodb_ip
+              protocol: TCP
         - name: tcpdump
           image: corfr/tcpdump
           command:
@@ -47,9 +43,12 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      serviceAccountName: ausf-sa
+      serviceAccountName: f5gc-ausf-sa
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: certs
+        - name: f5gc-ausf-cert
           secret:
-            secretName: ausf-tls-secret
+            secretName: f5gc-ausf-tls-secret
+        - name: f5gc-ausf-config
+          configMap:
+            name: f5gc-ausf-config

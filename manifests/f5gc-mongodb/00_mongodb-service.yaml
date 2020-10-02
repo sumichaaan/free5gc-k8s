@@ -4,7 +4,7 @@ kind: Service
 metadata:
   labels:
     app: f5gc-mongodb
-  name: f5gc-mongodb-headless
+  name: f5gc-mongodb
 spec:
   type: ClusterIP
   ports:

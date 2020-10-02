@@ -6,7 +6,6 @@ metadata:
   name: f5gc-ausf
 spec:
   type: ClusterIP
-  clusterIP: None
   ports:
   - name: f5gc-ausf
     port: 29509

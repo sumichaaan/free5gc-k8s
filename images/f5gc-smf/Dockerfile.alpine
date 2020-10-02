@@ -4,7 +4,7 @@ FROM alpine:3.8
 LABEL description="Free5GC open source 5G Core Network" \
     version="Stage 3"
 
-ENV F5GC_MODULE udm
+ENV F5GC_MODULE smf
 ARG DEBUG_TOOLS
 
 # Install debug tools ~ 100MB (if DEBUG_TOOLS is set to true)
@@ -28,8 +28,8 @@ VOLUME [ "/free5gc/config" ]
 # Certificates (if not using default) volume
 VOLUME [ "/free5gc/support/TLS" ]
 
-ENTRYPOINT [ "./udm" ]
-CMD [ "-udmcfg", "../config/udmcfg.conf" ]
+ENTRYPOINT [ "./smf" ]
+CMD [ "-smfcfg", "../config/smfcfg.conf", "--uerouting", "../config/uerouting.yaml" ]
 
 # Exposed ports
-EXPOSE 29503
+EXPOSE 29502

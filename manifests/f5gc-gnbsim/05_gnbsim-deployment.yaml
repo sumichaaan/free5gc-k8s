@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f5gc-gnbsim
+  labels:
+    app: f5gc-gnbsim
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5gc-gnbsim
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: f5gc-gnbsim
+      annotations:
+        k8s.v1.cni.cncf.io/networks: f5gc-gnbsim-n1n2
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+        - name: f5gc-gnbsim
+          image: local/f5gc-gnbsim:master
+          imagePullPolicy: IfNotPresent
+          # imagePullPolicy: Always
+          command: ["sh"]
+          tty: true
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_TIME"]
+          volumeMounts:
+            - name: f5gc-gnbsim-config
+              mountPath: /gnbsim/example.json
+              subPath: example.json
+          ports:
+            - containerPort: 38412
+              name: if-n1n2
+              protocol: SCTP
+            - containerPort: 2152
+              name: if-n3
+              protocol: UDP
+        - name: tcpdump
+          image: corfr/tcpdump
+          command:
+            - /bin/sleep
+            - infinity
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: f5gc-gnbsim-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: f5gc-gnbsim-config
+          configMap:
+            name: f5gc-gnbsim-config

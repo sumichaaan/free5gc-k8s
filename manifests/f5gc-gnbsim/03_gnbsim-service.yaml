@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: f5gc-gnbsim
+  name: f5gc-gnbsim
+spec:
+  type: ClusterIP
+  ports:
+  - name: f5gc-gnbsim-n1n2
+    port: 38412
+    protocol: SCTP
+    targetPort: 38412
+  - name: f5gc-gnbsim-n3
+    port: 2152
+    protocol: UDP
+    targetPort: 2152
+  selector:
+    app: f5gc-gnbsim

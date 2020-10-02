@@ -1,4 +1,4 @@
-FROM local/f5gc-build-base:master AS builder
+FROM local/f5gc-build-base:v3.0.4 AS builder
 LABEL maintainer="Yoshifumi Sumida <yoshifumi.sumida@gmail.com>"
 
 FROM gcr.io/distroless/base:debug

@@ -13,8 +13,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Get and Build GNBSIM
+ENV COMMIT_ID=470405e51ec80216bfbcc9f5440ef02125dd1c7d
 RUN cd $GOPATH/src && \
     git clone https://github.com/hhorai/gnbsim && \
+    git checkout 470405e51ec80216bfbcc9f5440ef02125dd1c7d && \
     cd gnbsim && \
     make -j`nproc`
 
