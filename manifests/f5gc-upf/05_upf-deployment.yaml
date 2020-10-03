@@ -1,42 +1,44 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: f5gc-smf
+  name: f5gc-upf
   labels:
-    app: f5gc-smf
+    app: f5gc-upf
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: f5gc-smf
+      app: f5gc-upf
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: f5gc-smf
+        app: f5gc-upf
       annotations:
-        k8s.v1.cni.cncf.io/networks: f5gc-smf-n4
+        k8s.v1.cni.cncf.io/networks: f5gc-upf-n3, f5gc-upf-n4
     spec:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
       containers:
-        - name: f5gc-smf
-          image: local/f5gc-smf:v3.0.4
+        - name: f5gc-upf
+          image: local/f5gc-upf:v3.0.4
           imagePullPolicy: IfNotPresent
           # imagePullPolicy: Always
           securityContext:
-            privileged: false
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_TIME"]
           volumeMounts:
-            - name: f5gc-smf-config
+            - name: f5gc-upf-config
               mountPath: /free5gc/config
-            - name: f5gc-smf-cert
-              mountPath: /free5gc/support/TLS
+            - mountPath: /dev/net/tun
+              name: tun-devdir
           ports:
-            - containerPort: 29502
-              name: if-sbi
-              protocol: TCP
+            - containerPort: 2152
+              name: if-n3
+              protocol: UDP
             - containerPort: 8805
               name: if-n4
               protocol: UDP
@@ -48,12 +50,12 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      serviceAccountName: f5gc-smf-sa
+      serviceAccountName: f5gc-upf-sa
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: f5gc-smf-cert
-          secret:
-            secretName: f5gc-smf-tls-secret
-        - name: f5gc-smf-config
+        - name: f5gc-upf-config
           configMap:
-            name: f5gc-smf-config
+            name: f5gc-upf-config
+        - name: tun-devdir
+          hostPath:
+            path: /dev/net/tun

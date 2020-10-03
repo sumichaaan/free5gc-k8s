@@ -7,9 +7,13 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - name: f5gc-smf
+  - name: f5gc-smf-sbi
     port: 29502
     protocol: TCP
     targetPort: 29502
+  - name: f5gc-smf-n4
+    port: 8805
+    protocol: UDP
+    targetPort: 8805
   selector:
     app: f5gc-smf

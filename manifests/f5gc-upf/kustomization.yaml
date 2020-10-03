@@ -1,0 +1,9 @@
+resources:
+  - 00_upf-sa.yaml
+  - 01_upf-rbac.yaml
+  - 02_upf-configmap.yaml
+  - 03_upf-service.yaml
+  - 04_upf-multus.yaml
+  - 05_upf-deployment.yaml
+
+namespace: f5gc

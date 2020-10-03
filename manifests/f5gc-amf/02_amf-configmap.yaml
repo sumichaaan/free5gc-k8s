@@ -71,7 +71,7 @@ data:
     logger:
     # network function
       AMF:
-        debugLevel: info
+        debugLevel: debug
         ReportCaller: true
       SMF:
         debugLevel: info

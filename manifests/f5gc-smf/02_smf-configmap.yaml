@@ -13,7 +13,7 @@ data:
       sbi:
         scheme: http
         registerIPv4: f5gc-smf
-        bindingIPv4: 0.0.0.0
+        bindingIPv4: 0.0.0.0 
         port: 29502
         tls:
           key: free5gc/support/TLS/smf.key
@@ -33,7 +33,7 @@ data:
           dnnSmfInfoList:
             - dnn: internet
       pfcp:
-        addr: 0.0.0.0
+        addr: 172.16.30.20
       userplane_information:
         up_nodes:
           gNB01:
@@ -41,7 +41,7 @@ data:
             an_ip: 192.168.10.10
           UPF:
             type: UPF
-            node_id: f5gc-upf
+            node_id: 172.16.30.30
         links:
           - A: gNB01
             B: UPF
