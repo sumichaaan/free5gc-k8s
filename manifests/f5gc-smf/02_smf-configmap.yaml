@@ -1,0 +1,166 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: f5gc-smf-config
+data:
+  smfcfg.conf: |
+    info:
+      version: 1.0.0
+      description: AMF initial local configuration
+    
+    configuration:
+      smfName: SMF
+      sbi:
+        scheme: http
+        registerIPv4: f5gc-smf
+        bindingIPv4: 0.0.0.0
+        port: 29502
+        tls:
+          key: free5gc/support/TLS/smf.key
+          pem: free5gc/support/TLS/smf.pem
+      serviceNameList:
+        - nsmf-pdusession
+        - nsmf-event-exposure
+      snssai_info:
+        - sNssai:
+            sst: 1
+            sd: 010203
+          dnnSmfInfoList:
+            - dnn: internet
+        - sNssai:
+            sst: 1
+            sd: 112233
+          dnnSmfInfoList:
+            - dnn: internet
+      pfcp:
+        addr: 0.0.0.0
+      userplane_information:
+        up_nodes:
+          gNB01:
+            type: AN
+            an_ip: 192.168.10.10
+          UPF:
+            type: UPF
+            node_id: f5gc-upf
+        links:
+          - A: gNB01
+            B: UPF
+      dnn:
+        internet:
+          dns:
+            ipv4: 8.8.8.8
+            ipv6: 2001:4860:4860::8888
+        internet2:
+          dns:
+            ipv4: 8.8.4.4
+            ipv6: 2001:4860:4860::8844
+      ue_subnet: 60.60.0.0/16
+      nrfUri: http://f5gc-nrf:29510
+
+  uerouting.yaml: |
+    info:
+      version: 1.0.0
+      description: Routing information for UE
+    
+    ueRoutingInfo:
+      - SUPI: imsi-2089300007487
+        AN: 10.200.200.101
+        PathList:
+          - DestinationIP: 60.60.0.101
+            DestinationPort: 8888
+            UPF: !!seq
+              - BranchingUPF
+              - AnchorUPF1
+    
+          - DestinationIP: 60.60.0.103
+            DestinationPort: 9999
+            UPF: !!seq
+              - BranchingUPF
+              - AnchorUPF2
+    
+      - SUPI: imsi-2089300007486
+        AN: 10.200.200.102
+        PathList:
+          - DestinationIP: 10.0.0.10
+            DestinationPort: 8888
+            UPF: !!seq
+              - BranchingUPF
+              - AnchorUPF1
+    
+          - DestinationIP: 10.0.0.11
+            DestinationPort: 9999
+            UPF: !!seq
+              - BranchingUPF
+              - AnchorUPF2
+
+  free5GC.conf: |
+    db_uri: mongodb://f5gc-mongodb:27017/free5GC
+    #all logging levels
+    #panic
+    #fatal
+    #error
+    #warn
+    #info
+    #debug
+    #trace
+    logger:
+    # network function
+      AMF:
+        debugLevel: info
+        ReportCaller: true
+      SMF:
+        debugLevel: info
+        ReportCaller: true
+      UDR:
+        debugLevel: info
+        ReportCaller: true
+      UDM:
+        debugLevel: info
+        ReportCaller: true
+      NRF:
+        debugLevel: info
+        ReportCaller: true
+      PCF:
+        debugLevel: info
+        ReportCaller: true
+      AUSF:
+        debugLevel: info
+        ReportCaller: true
+      N3IWF:
+        debugLevel: info
+        ReportCaller: true
+    # library
+      NAS:
+        debugLevel: info
+        ReportCaller: true
+      FSM:
+        debugLevel: info
+        ReportCaller: true
+      NGAP:
+        debugLevel: info
+        ReportCaller: true
+      NamfComm:
+        debugLevel: info
+        ReportCaller: true
+      NamfEventExposure:
+        debugLevel: info
+        ReportCaller: true
+      NsmfPDUSession:
+        debugLevel: info
+        ReportCaller: true
+      NudrDataRepository:
+        debugLevel: info
+        ReportCaller: true
+      OpenApi:
+        debugLevel: debug
+        ReportCaller: true
+      Aper:
+        debugLevel: info
+        ReportCaller: true
+      CommonConsumerTest:
+        debugLevel: info
+        ReportCaller: true
+    # webui
+      WEBUI:
+        debugLevel: info
+        ReportCaller: true

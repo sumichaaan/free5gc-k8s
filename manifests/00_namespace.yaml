@@ -1,6 +1,6 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: free5gc
+  name: f5gc
   labels:
     name: free5gc

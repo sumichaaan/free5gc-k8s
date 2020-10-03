@@ -16,14 +16,14 @@ spec:
       labels:
         app: f5gc-gnbsim
       annotations:
-        k8s.v1.cni.cncf.io/networks: f5gc-gnbsim-n1n2
+        k8s.v1.cni.cncf.io/networks: f5gc-gnbsim-n1n2, f5gc-gnbsim-n3
     spec:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
       containers:
         - name: f5gc-gnbsim
-          image: local/f5gc-gnbsim:master
+          image: local/f5gc-gnbsim:v3.0.4
           imagePullPolicy: IfNotPresent
           # imagePullPolicy: Always
           command: ["sh"]
@@ -36,6 +36,8 @@ spec:
             - name: f5gc-gnbsim-config
               mountPath: /gnbsim/example.json
               subPath: example.json
+            - mountPath: /dev/net/tun
+              name: tun-devdir
           ports:
             - containerPort: 38412
               name: if-n1n2
@@ -57,3 +59,7 @@ spec:
         - name: f5gc-gnbsim-config
           configMap:
             name: f5gc-gnbsim-config
+        - name: tun-devdir
+          hostPath:
+            path: /dev/net/tun
+

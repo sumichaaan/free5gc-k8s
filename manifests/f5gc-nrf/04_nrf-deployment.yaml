@@ -21,7 +21,7 @@ spec:
         runAsGroup: 0
       containers:
         - name: f5gc-nrf
-          image: local/f5gc-nrf:master
+          image: local/f5gc-nrf:v3.0.4
           imagePullPolicy: IfNotPresent
           # imagePullPolicy: Always
           securityContext:

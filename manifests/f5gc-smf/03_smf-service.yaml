@@ -6,7 +6,6 @@ metadata:
   name: f5gc-smf
 spec:
   type: ClusterIP
-  clusterIP: None
   ports:
   - name: f5gc-smf
     port: 29502

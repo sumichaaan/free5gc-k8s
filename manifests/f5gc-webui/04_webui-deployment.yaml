@@ -1,39 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: f5gc-ausf
+  name: f5gc-webui
   labels:
-    app: f5gc-ausf
+    app: f5gc-webui
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: f5gc-ausf
+      app: f5gc-webui
   strategy:
-    type: Recreate
+    type: RollingUpdate
   template:
     metadata:
       labels:
-        app: f5gc-ausf
+        app: f5gc-webui
     spec:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
       containers:
-        - name: f5gc-ausf
-          image: local/f5gc-ausf:v3.0.4
+        - name: f5gc-webui
+          image: local/f5gc-webui:v3.0.4
           imagePullPolicy: IfNotPresent
           # imagePullPolicy: Always
           securityContext:
-            privileged: true
+            privileged: false
           volumeMounts:
-            - name: f5gc-ausf-config
+            - name: f5gc-webui-config
               mountPath: /free5gc/config
-            - name: f5gc-ausf-cert
-              mountPath: /free5gc/support/TLS
           ports:
-            - containerPort: 29509
-              name: f5gc-ausf
+            - containerPort: 5000
+              name: f5gc-webui
               protocol: TCP
         - name: tcpdump
           image: corfr/tcpdump
@@ -43,12 +41,9 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      serviceAccountName: f5gc-ausf-sa
+      serviceAccountName: f5gc-webui-sa
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: f5gc-ausf-cert
-          secret:
-            secretName: f5gc-ausf-tls-secret
-        - name: f5gc-ausf-config
+        - name: f5gc-webui-config
           configMap:
-            name: f5gc-ausf-config
+            name: f5gc-webui-config

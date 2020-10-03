@@ -10,17 +10,17 @@ data:
     
     configuration:
       sbi:
-        scheme: https
+        scheme: http
         registerIPv4: f5gc-udr     # Can also be a kubernetes service IP or domain name.
         bindingIPv4: 0.0.0.0       # Can also be an ENV.
         port: 29504
       mongodb:
         name: free5gc
         url: mongodb://f5gc-mongodb:27017
-      nrfUri: https://f5gc-nrf:29510
+      nrfUri: http://f5gc-nrf:29510
 
   free5GC.conf: |
-    db_uri: mongodb://f5gc-mongodb/free5gc
+    db_uri: mongodb://f5gc-mongodb:27017/free5gc
     
     #all logging levels
     #panic

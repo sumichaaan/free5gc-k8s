@@ -6,4 +6,4 @@ resources:
   - 04_gnbsim-multus.yaml
   - 05_gnbsim-deployment.yaml
 
-namespace: free5gc
+namespace: f5gc

@@ -23,7 +23,7 @@ spec:
         runAsGroup: 0
       containers:
         - name: f5gc-amf
-          image: local/f5gc-amf:master
+          image: local/f5gc-amf:v3.0.4
           imagePullPolicy: IfNotPresent
           # imagePullPolicy: Always
           securityContext:

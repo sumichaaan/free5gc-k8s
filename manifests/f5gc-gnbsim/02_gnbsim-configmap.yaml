@@ -31,7 +31,7 @@ data:
             "RANUENGAPID" : 0,
             "UE": {
                     "imeisv": "0000000100000101",
-                    "msin": "0123456789",
+                    "msin": "0000000001",
                     "mcc": 208,
                     "mnc": 93,
                     "RoutingIndicator": 1234,

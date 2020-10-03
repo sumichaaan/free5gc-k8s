@@ -14,7 +14,7 @@ data:
       MongoDBUrl: "mongodb://f5gc-mongodb:27017"
       DefaultServiceIP: "f5gc-nrf"
       sbi:
-        scheme: https
+        scheme: http
         ipv4Addr: 0.0.0.0
         port: 29510
       DefaultPlmnId:
@@ -25,7 +25,7 @@ data:
         - nnrf-disc
 
   free5GC.conf: |
-    db_uri: mongodb://f5gc-mongodb/free5GC
+    db_uri: mongodb://f5gc-mongodb:27017/free5GC
     #all logging levels
     #panic
     #fatal

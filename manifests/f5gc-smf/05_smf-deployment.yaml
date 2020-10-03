@@ -16,29 +16,27 @@ spec:
       labels:
         app: f5gc-smf
       annotations:
-        k8s.v1.cni.cncf.io/networks: smf-net1
+        k8s.v1.cni.cncf.io/networks: f5gc-smf-n4
     spec:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
       containers:
-        - name: smf
-          image: sumichaaan/f5gc-smf:latest
-          imagePullPolicy: Always
+        - name: f5gc-smf
+          image: local/f5gc-smf:v3.0.4
+          imagePullPolicy: IfNotPresent
+          # imagePullPolicy: Always
           securityContext:
-            privileged: true
+            privileged: false
           volumeMounts:
-            - name: certs
-              mountPath: /opt/f5gc-smf/certs
+            - name: f5gc-smf-config
+              mountPath: /free5gc/config
+            - name: f5gc-smf-cert
+              mountPath: /free5gc/support/TLS
           ports:
             - containerPort: 29502
               name: f5gc-smf
-          env:
-            - name: MONGODB_IP
-              valueFrom:
-                configMapKeyRef:
-                  name: smf-config
-                  key: mongodb_ip
+              protocol: TCP
         - name: tcpdump
           image: corfr/tcpdump
           command:
@@ -47,9 +45,12 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      serviceAccountName: smf-sa
+      serviceAccountName: f5gc-smf-sa
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: certs
+        - name: f5gc-smf-cert
           secret:
-            secretName: smf-tls-secret
+            secretName: f5gc-smf-tls-secret
+        - name: f5gc-smf-config
+          configMap:
+            name: f5gc-smf-config

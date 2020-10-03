@@ -1,0 +1,8 @@
+resources:
+  - 00_webui-sa.yaml
+  - 01_webui-rbac.yaml
+  - 02_webui-configmap.yaml
+  - 03_webui-service.yaml
+  - 04_webui-deployment.yaml
+
+namespace: f5gc

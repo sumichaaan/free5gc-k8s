@@ -11,13 +11,13 @@ data:
     configuration:
       pcfName: PCF
       sbi:
-        scheme: https
+        scheme: http
         registerIPv4: f5gc-pcf     # Can also be a kubernetes service IP or domain name.
         bindingIPv4: 0.0.0.0      # Can also be an ENV.
         port: 29507
       timeFormat: 2019-01-02 15:04:05
       defaultBdtRefId: BdtPolicyId-
-      nrfUri: https://f5gc-nrf:29510
+      nrfUri: http://f5gc-nrf:29510
       serviceList:
         - serviceName: npcf-am-policy-control
         - serviceName: npcf-smpolicycontrol
@@ -29,7 +29,7 @@ data:
         - serviceName: npcf-ue-policy-control
 
   free5GC.conf: |
-    db_uri: mongodb://f5gc-mongodb/free5gc
+    db_uri: mongodb://f5gc-mongodb:27017/free5gc
 
     #all logging levels
     #panic

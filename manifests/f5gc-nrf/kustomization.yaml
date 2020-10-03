@@ -5,11 +5,11 @@ resources:
   - 03_nrf-service.yaml
   - 04_nrf-deployment.yaml
 
-namespace: free5gc
+namespace: f5gc
 
 secretGenerator:
 - name: f5gc-nrf-tls-secret
-  namespace: free5gc
+  namespace: f5gc
   files:
   - cert/nrf.pem
   - cert/nrf.key

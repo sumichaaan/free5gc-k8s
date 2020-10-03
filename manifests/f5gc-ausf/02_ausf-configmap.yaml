@@ -10,13 +10,13 @@ data:
     
     configuration:
       sbi:
-        scheme: https
+        scheme: http
         registerIPv4: f5gc-ausf     # Can also be a kubernetes service IP or domain name.
         bindingIPv4: 0.0.0.0      # Can also be an ENV.
         port: 29509
       serviceNameList:
         - nausf-auth
-      nrfUri: https://f5gc-nrf:29510
+      nrfUri: http://f5gc-nrf:29510
       plmnSupportList:
         - mcc: 208
           mnc: 93
@@ -25,7 +25,7 @@ data:
       groupId: ausfGroup001  
 
   free5GC.conf: |
-    db_uri: mongodb://f5gc-mongodb/free5GC
+    db_uri: mongodb://f5gc-mongodb:27017/free5GC
     #all logging levels
     #panic
     #fatal

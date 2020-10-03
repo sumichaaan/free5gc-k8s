@@ -24,7 +24,7 @@ WORKDIR /free5gc/webconsole
 # Config files volume
 VOLUME [ "/free5gc/config" ]
 
-ENTRYPOINT [ "./webconsole" ]
+ENTRYPOINT [ "./webui" ]
 
 # WebUI uses the port 5000
 EXPOSE 5000

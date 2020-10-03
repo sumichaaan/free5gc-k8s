@@ -21,7 +21,7 @@ spec:
         runAsGroup: 0
       containers:
         - name: f5gc-udr
-          image: local/f5gc-udr:master
+          image: local/f5gc-udr:v3.0.4
           imagePullPolicy: IfNotPresent
           # imagePullPolicy: Always
           securityContext:

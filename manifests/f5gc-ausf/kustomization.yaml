@@ -5,11 +5,11 @@ resources:
   - 03_ausf-service.yaml
   - 04_ausf-deployment.yaml
 
-namespace: free5gc
+namespace: f5gc
 
 secretGenerator:
 - name: f5gc-ausf-tls-secret
-  namespace: free5gc
+  namespace: f5gc
   files:
   - cert/ausf.pem
   - cert/ausf.key

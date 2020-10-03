@@ -5,11 +5,11 @@ resources:
   - 03_nssf-service.yaml
   - 04_nssf-deployment.yaml
 
-namespace: free5gc
+namespace: f5gc
 
 secretGenerator:
 - name: f5gc-nssf-tls-secret
-  namespace: free5gc
+  namespace: f5gc
   files:
   - cert/nssf.pem
   - cert/nssf.key

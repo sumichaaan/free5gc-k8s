@@ -13,7 +13,7 @@ data:
       ngapIpList:
         - 172.16.10.11                 # assigned to a second network interface
       sbi:
-        scheme: https
+        scheme: http
         registerIPv4: f5gc-amf         # Can also be a kubernetes service IP or domain name.
         bindingIPv4: 0.0.0.0           # Can also be an ENV.
         port: 29518
@@ -44,14 +44,14 @@ data:
               sd: 112233
       supportDnnList:
         - internet
-      nrfUri: https://f5gc-nrf:29510
+      nrfUri: http://f5gc-nrf:29510
       security:
         integrityOrder:
           - NIA2
-          # - NIA0
+          - NIA0
         cipheringOrder:
+          - NEA2
           - NEA0
-          # - NEA2
       networkName:
         full: free5GC
         short: free
@@ -59,7 +59,7 @@ data:
       t3512: 3600
       non3gppDeregistrationTimer: 1000
   free5GC.conf: |
-    db_uri: mongodb://f5gc-mongodb/free5GC
+    db_uri: mongodb://f5gc-mongodb:27017/free5GC
     #all logging levels
     #panic
     #fatal

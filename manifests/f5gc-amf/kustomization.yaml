@@ -6,11 +6,11 @@ resources:
   - 04_amf-multus.yaml
   - 05_amf-deployment.yaml
 
-namespace: free5gc
+namespace: f5gc
 
 secretGenerator:
 - name: f5gc-amf-tls-secret
-  namespace: free5gc
+  namespace: f5gc
   files:
   - cert/amf.pem
   - cert/amf.key

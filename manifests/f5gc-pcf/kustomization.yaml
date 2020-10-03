@@ -5,11 +5,11 @@ resources:
   - 03_pcf-service.yaml
   - 04_pcf-deployment.yaml
 
-namespace: free5gc
+namespace: f5gc
 
 secretGenerator:
 - name: f5gc-pcf-tls-secret
-  namespace: free5gc
+  namespace: f5gc
   files:
   - cert/pcf.pem
   - cert/pcf.key

@@ -5,11 +5,11 @@ resources:
   - 03_udr-service.yaml
   - 04_udr-deployment.yaml
 
-namespace: free5gc
+namespace: f5gc
 
 secretGenerator:
 - name: f5gc-udr-tls-secret
-  namespace: free5gc
+  namespace: f5gc
   files:
   - cert/udr.pem
   - cert/udr.key
