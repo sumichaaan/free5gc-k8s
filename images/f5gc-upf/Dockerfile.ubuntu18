@@ -24,8 +24,8 @@ RUN mkdir -p ${F5GC_MODULE}/config/
 COPY --from=builder /free5gc/${F5GC_MODULE} ./${F5GC_MODULE}/
 
 # Copy linked libs
-COPY --from=builder /free5gc/libgtp5gnl.so.0 /usr/local/lib
-COPY --from=builder /free5gc/liblogger.so /usr/local/lib
+# COPY --from=builder /free5gc/libgtp5gnl.so.0 /usr/local/lib
+# COPY --from=builder /free5gc/liblogger.so /usr/local/lib
 
 # Move to the executable location
 WORKDIR /free5gc/${F5GC_MODULE}
@@ -35,3 +35,6 @@ RUN ldconfig
 
 ENTRYPOINT ["./free5gc-upfd" ]
 CMD [ "-f", "../config/upfcfg.yaml" ]
+
+# Exposed ports
+EXPOSE 8805/udp

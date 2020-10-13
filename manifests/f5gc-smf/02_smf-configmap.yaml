@@ -36,14 +36,14 @@ data:
         addr: 172.16.30.20
       userplane_information:
         up_nodes:
-          gNB01:
+          gNB1:
             type: AN
             an_ip: 192.168.10.10
           UPF:
             type: UPF
             node_id: 172.16.30.30
         links:
-          - A: gNB01
+          - A: gNB1
             B: UPF
       dnn:
         internet:
@@ -109,7 +109,7 @@ data:
         debugLevel: info
         ReportCaller: true
       SMF:
-        debugLevel: info
+        debugLevel: debug
         ReportCaller: true
       UDR:
         debugLevel: info

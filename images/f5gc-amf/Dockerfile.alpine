@@ -32,4 +32,5 @@ ENTRYPOINT [ "./amf" ]
 CMD [ "-amfcfg", "../config/amfcfg.conf" ]
 
 # Exposed ports
-EXPOSE 29518
+EXPOSE 29518/tcp
+EXPOSE 38412/sctp

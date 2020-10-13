@@ -32,4 +32,6 @@ ENTRYPOINT [ "./smf" ]
 CMD [ "-smfcfg", "../config/smfcfg.conf", "--uerouting", "../config/uerouting.yaml" ]
 
 # Exposed ports
-EXPOSE 29502
+EXPOSE 29502/tcp
+EXPOSE 8805/udp
+

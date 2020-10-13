@@ -5,11 +5,16 @@ metadata:
     app: f5gc-amf
   name: f5gc-amf
 spec:
-  type: ClusterIP
+  # type: ClusterIP
+  clusterIP: None
   ports:
   - name: f5gc-amf
     port: 29518
     protocol: TCP
     targetPort: 29518
+  - name: if-n1n2
+    port: 38412
+    protocol: SCTP
+    targetPort: 38412
   selector:
     app: f5gc-amf

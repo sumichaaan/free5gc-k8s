@@ -37,6 +37,9 @@ spec:
             - containerPort: 29518
               name: f5gc-amf
               protocol: TCP
+            - containerPort: 38412
+              name: if-n1n2
+              protocol: SCTP
         - name: tcpdump
           image: corfr/tcpdump
           command:

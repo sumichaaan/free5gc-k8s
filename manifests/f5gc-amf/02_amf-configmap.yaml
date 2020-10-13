@@ -11,7 +11,7 @@ data:
     configuration:
       amfName: AMF
       ngapIpList:
-        - 172.16.10.11                 # assigned to a second network interface
+        - 0.0.0.0                 # assigned to a second network interface
       sbi:
         scheme: http
         registerIPv4: f5gc-amf         # Can also be a kubernetes service IP or domain name.
@@ -71,7 +71,7 @@ data:
     logger:
     # network function
       AMF:
-        debugLevel: debug
+        debugLevel: trace
         ReportCaller: true
       SMF:
         debugLevel: info
@@ -102,10 +102,10 @@ data:
         debugLevel: info
         ReportCaller: true
       NGAP:
-        debugLevel: info
+        debugLevel: trace
         ReportCaller: true
       NamfComm:
-        debugLevel: info
+        debugLevel: debug
         ReportCaller: true
       NamfEventExposure:
         debugLevel: info

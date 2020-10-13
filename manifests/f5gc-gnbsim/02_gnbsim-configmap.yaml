@@ -31,7 +31,7 @@ data:
             "RANUENGAPID" : 0,
             "UE": {
                     "imeisv": "0000000100000101",
-                    "msin": "0000000001",
+                    "msin": "0000000003",
                     "mcc": 208,
                     "mnc": 93,
                     "RoutingIndicator": 1234,
@@ -62,6 +62,6 @@ data:
                             "TAC": "0x000001"
                     }
             },
-            "GTPuAddr": "172.16.10.10",
-            "GTPuIFname": "net1"
+            "GTPuAddr": "192.168.10.10",
+            "GTPuIFname": "net2"
     }
