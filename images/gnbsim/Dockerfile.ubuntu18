@@ -13,7 +13,6 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Get and Build GNBSIM
-# COPY gnbsim/ gnbsim/
 RUN cd $GOPATH/src && \
     git clone https://github.com/hhorai/gnbsim && \
     cd gnbsim && \
@@ -24,7 +23,7 @@ FROM ubuntu:18.04
 WORKDIR /gnbsim
 
 # Copy executables
-COPY --from=builder /go/gnbsim/example/example example
-COPY --from=builder /go/gnbsim/example/example.json example.json
+COPY --from=builder /go/src/gnbsim/example/example example
+COPY --from=builder /go/src/gnbsim/example/example.json example.json
 
 ENTRYPOINT ["./example"]
