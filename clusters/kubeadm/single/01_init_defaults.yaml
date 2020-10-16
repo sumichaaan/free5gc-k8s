@@ -46,7 +46,7 @@ controllerManager:
 scheduler: {}
 certificatesDir: /etc/kubernetes/pki
 imageRepository: k8s.gcr.io
-kubernetesVersion: v1.19.2
+kubernetesVersion: v1.19.3
 useHyperKubeImage: false
 clusterName: ool5g
 
