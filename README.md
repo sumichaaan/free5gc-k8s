@@ -3,6 +3,4 @@ The free5GC is an open-source project for 5th generation (5G) mobile core networ
 
 This repository aims to install dockerized free5gc stage3 and ride on kubernetes.
 
-NOTE: Can work at version `5.0.0-23-lowlatency` to run UPF(GTP5G Module.)
-
-NOTE: Work in Progress.  Parameterizing and so on is not done.
+NOTE: Can work at version `5.0.0-23-generic` to run UPF(GTP5G Module.)
