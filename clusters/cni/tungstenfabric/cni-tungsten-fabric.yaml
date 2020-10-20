@@ -11,28 +11,43 @@ metadata:
   namespace: kube-system
 data:
   AAA_MODE: no-auth
-  AUTH_MODE: noauth
-  ANALYTICSDB_ENABLE: "false"
-  ANALYTICS_ALARM_ENABLE: "false"
-  ANALYTICS_SNMP_ENABLE: "false"
+  # ANALYTICS_API_VIP: ""
   ANALYTICS_NODES: 192.168.31.61
   ANALYTICSDB_NODES: 192.168.31.61
   ANALYTICS_SNMP_NODES: 192.168.31.61
   ANALYTICS_ALARM_NODES: 192.168.31.61
-  CLOUD_ORCHESTRATOR: none
+  ANALYTICSDB_ENABLE: "false"
+  ANALYTICS_ALARM_ENABLE: "false"
+  ANALYTICS_SNMP_ENABLE: "false"
+  AUTH_MODE: noauth
+  CLOUD_ORCHESTRATOR: kubernetes
+  # CONFIG_API_VIP: ""
   CONFIG_NODES: 192.168.31.61
   CONFIGDB_NODES: 192.168.31.61
   CONTROL_NODES: 192.168.31.61
   CONTROLLER_NODES: 192.168.31.61
+  KUBERNETES_IP_FABRIC_FORWARDING: "true"
+  KUBERNETES_IP_FABRIC_SNAT: "false"
+  KUBERNETES_POD_SUBNETS: 172.20.0.0/16
+  KUBERNETES_SERVICE_SUBNETS: 10.96.0.0/12
+  KUBERNETES_IP_FABRIC_SUBNETS: 10.80.0.0/12
+  # KUBERNETES_PUBLIC_FIP_POOL: ""
   LOG_LEVEL: SYS_DEBUG
   METADATA_PROXY_SECRET: contrail
-  PHYSICAL_INTERFACE: eno2
+  PHYSICAL_INTERFACE: ens6f0
   RABBITMQ_NODES: 192.168.31.61
   RABBITMQ_NODE_PORT: "5673"
+  VROUTER_GATEWAY: 192.168.101.100
   WEBUI_NODES: 192.168.31.61
-  ZOOKEEPER_NODES: 192.168.31.61
-  ZOOKEEPER_PORT: "2181"
-  ZOOKEEPER_PORTS: "2888:3888"
+  # WEBUI_VIP: ""
+---
+# default params will be set in provisioner environment
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: defaults-env
+  namespace: kube-system
+data:
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -58,6 +73,7 @@ metadata:
   name: contrail-analyticsdb-config
   namespace: kube-system
 data:
+  JVM_EXTRA_OPTS: -Xms1g -Xmx2g
   CASSANDRA_SEEDS: 192.168.31.61
   CASSANDRA_CLUSTER_NAME: Contrail
   CASSANDRA_START_RPC: "true"
@@ -74,6 +90,7 @@ metadata:
   name: contrail-configdb-config
   namespace: kube-system
 data:
+  JVM_EXTRA_OPTS: -Xms1g -Xmx2g
   CASSANDRA_SEEDS: 192.168.31.61
   CASSANDRA_CLUSTER_NAME: ContrailConfigDB
   CASSANDRA_START_RPC: "true"
@@ -101,7 +118,10 @@ data:
   KUBERNETES_API_SERVER: 192.168.31.61
   KUBERNETES_API_SECURE_PORT: "6443"
   K8S_TOKEN_FILE: "/tmp/serviceaccount/token"
-
+  KUBERNETES_POD_SUBNETS: 172.20.0.0/16
+  KUBERNETES_SERVICE_SUBNETS: 10.96.0.0/12
+  KUBERNETES_IP_FABRIC_SUBNETS: 10.80.0.0/12
+  
 # Containers section
 ---
 apiVersion: apps/v1
@@ -131,14 +151,11 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
-      - key: node.kubernetes.io/not-ready
-        operator: Exists
-        effect: NoSchedule
       hostNetwork: true
       containers:
       - name: config-zookeeper
-        image: "opencontrailnightly/contrail-external-zookeeper:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-external-zookeeper:latest"
+        imagePullPolicy: "IfNotPresent"
         env:
         - name: NODE_TYPE
           value: config-database
@@ -189,19 +206,16 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
-      - key: node.kubernetes.io/not-ready
-        operator: Exists
-        effect: NoSchedule
       hostNetwork: true
       initContainers:
       - name: contrail-node-init
-        image: "opencontrailnightly/contrail-node-init:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-node-init:latest"
+        imagePullPolicy: "IfNotPresent"
         env:
         - name: NODE_TYPE
           value: "database"
         - name: CONTRAIL_STATUS_IMAGE
-          value: "opencontrailnightly/contrail-status:latest"
+          value: "tungstenfabric/contrail-status:latest"
         envFrom:
         - configMapRef:
             name: contrail-analyticsdb-config
@@ -214,8 +228,8 @@ spec:
           name: host-var-lib
       containers:
       - name: contrail-analyticsdb-nodemgr
-        image: "opencontrailnightly/contrail-nodemgr:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-nodemgr:latest"
+        imagePullPolicy: "IfNotPresent"
         securityContext:
           privileged: true
         envFrom:
@@ -232,12 +246,37 @@ spec:
           value: "2"
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: analyticsdb-logs
+          name: contrail-logs
         - mountPath: /mnt
           name: docker-unix-socket
+      - name: contrail-analyticsdb-provisioner
+        image: "tungstenfabric/contrail-provisioner:latest"
+        imagePullPolicy: "IfNotPresent"
+        securityContext:
+          privileged: true
+        envFrom:
+        - configMapRef:
+            name: env
+        - configMapRef:
+            name: defaults-env
+        - configMapRef:
+            name: nodemgr-config
+        - configMapRef:
+            name: contrail-analyticsdb-config
+        env:
+        - name: NODE_TYPE
+          value: database
+        - name: DATABASE_NODEMGR__DEFAULTS__minimum_diskGB
+          value: "2"
+        volumeMounts:
+        - mountPath: /var/log/contrail
+          name: contrail-logs
       - name: contrail-analyticsdb
-        image: "opencontrailnightly/contrail-external-cassandra:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-external-cassandra:latest"
+        securityContext:
+          capabilities:
+            add: ["SYS_NICE"]
+        imagePullPolicy: "IfNotPresent"
         env:
         - name: NODE_TYPE
           value: database
@@ -250,8 +289,8 @@ spec:
         - mountPath: /var/log/cassandra
           name: analyticsdb-logs
       - name: contrail-analytics-query-engine
-        image: "opencontrailnightly/contrail-analytics-query-engine:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-analytics-query-engine:latest"
+        imagePullPolicy: "IfNotPresent"
         securityContext:
           privileged: true
         env:
@@ -264,7 +303,7 @@ spec:
             name: configzookeeperenv
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: analyticsdb-logs
+          name: contrail-logs
       imagePullSecrets:
       - name: 
       volumes:
@@ -273,7 +312,10 @@ spec:
           path: /var/lib/contrail/analyticsdb
       - name: analyticsdb-logs
         hostPath:
-          path: /var/log/contrail/analyticsdb
+          path: /var/log/contrail/database
+      - name: contrail-logs
+        hostPath:
+          path: /var/log/contrail
       - name: docker-unix-socket
         hostPath:
           path: /var/run
@@ -311,14 +353,14 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
-      - key: node.kubernetes.io/not-ready
-        operator: Exists
-        effect: NoSchedule
       hostNetwork: true
       containers:
       - name: contrail-configdb
-        image: "opencontrailnightly/contrail-external-cassandra:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-external-cassandra:latest"
+        securityContext:
+          capabilities:
+            add: ["SYS_NICE"]
+        imagePullPolicy: "IfNotPresent"
         env:
         - name: NODE_TYPE
           value: config-database
@@ -330,66 +372,9 @@ spec:
           name: configdb-data
         - mountPath: /var/log/cassandra
           name: configdb-logs
-      imagePullSecrets:
-      - name: 
-      volumes:
-      - name: configdb-data
-        hostPath:
-          path: /var/lib/contrail/configdb
-      - name: configdb-logs
-        hostPath:
-          path: /var/log/contrail/configdb
----
-apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: contrail-config-database-nodemgr
-  namespace: kube-system
-  labels:
-    app: contrail-config-database-nodemgr
-spec:
-  selector:
-    matchLabels:
-      app: contrail-config-database-nodemgr
-  template:
-    metadata:
-      labels:
-        app: contrail-config-database-nodemgr
-    spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: "node-role.opencontrail.org/configdb"
-                operator: Exists
-      tolerations:
-      - key: node-role.kubernetes.io/master
-        operator: Exists
-        effect: NoSchedule
-      - key: node.kubernetes.io/not-ready
-        operator: Exists
-        effect: NoSchedule
-      hostNetwork: true
-      initContainers:
-      - name: contrail-node-init
-        image: "opencontrailnightly/contrail-node-init:latest"
-        imagePullPolicy: ""
-        securityContext:
-          privileged: true
-        env:
-        - name: CONTRAIL_STATUS_IMAGE
-          value: "opencontrailnightly/contrail-status:latest"
-        envFrom:
-        - configMapRef:
-            name: env
-        volumeMounts:
-        - mountPath: /host/usr/bin
-          name: host-usr-bin
-      containers:
       - name: contrail-config-database-nodemgr
-        image: "opencontrailnightly/contrail-nodemgr:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-nodemgr:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
@@ -406,28 +391,51 @@ spec:
 # path:
 # hostPath:
 #   path: /var/run/docker.sock and
-#   type: Socket
+ #   type: Socket
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: configdb-logs
+          name: contrail-logs
         - mountPath: /mnt
           name: docker-unix-socket
+      - name: contrail-config-database-provisioner
+        image: "tungstenfabric/contrail-provisioner:latest"
+        imagePullPolicy: "IfNotPresent"
+        envFrom:
+        - configMapRef:
+            name: env
+        - configMapRef:
+            name: defaults-env
+        - configMapRef:
+            name: nodemgr-config
+        - configMapRef:
+            name: contrail-configdb-config
+        env:
+        - name: NODE_TYPE
+          value: config-database
+        - name: CONFIG_DATABASE_NODEMGR__DEFAULTS__minimum_diskGB
+          value: "2"
+        volumeMounts:
+        - mountPath: /var/log/contrail
+          name: contrail-logs
       imagePullSecrets:
       - name: 
       volumes:
+      - name: configdb-data
+        hostPath:
+          path: /var/lib/contrail/configdb
       - name: configdb-logs
         hostPath:
-          path: /var/log/contrail/configdb
+          path: /var/log/contrail/config-database
       - name: docker-unix-socket
         hostPath:
           path: /var/run
-      # - name: docker-unix-socket
-      #   hostPath:
-      #     path: /var/run/docker.sock
-      #     type: Socket
       - name: host-usr-bin
         hostPath:
           path: /usr/bin
+      - name: contrail-logs
+        hostPath:
+          path: /var/log/contrail
+
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -456,19 +464,16 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
-      - key: node.kubernetes.io/not-ready
-        operator: Exists
-        effect: NoSchedule
       hostNetwork: true
       initContainers:
       - name: contrail-node-init
-        image: "opencontrailnightly/contrail-node-init:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-node-init:latest"
+        imagePullPolicy: "IfNotPresent"
         securityContext:
           privileged: true
         env:
         - name: CONTRAIL_STATUS_IMAGE
-          value: "opencontrailnightly/contrail-status:latest"
+          value: "tungstenfabric/contrail-status:latest"
         envFrom:
         - configMapRef:
             name: env
@@ -477,8 +482,8 @@ spec:
           name: host-usr-bin
       containers:
       - name: contrail-analytics-api
-        image: "opencontrailnightly/contrail-analytics-api:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-analytics-api:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
@@ -486,19 +491,19 @@ spec:
             name: configzookeeperenv
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: analytics-logs
+          name: contrail-logs
       - name: contrail-analytics-collector
-        image: "opencontrailnightly/contrail-analytics-collector:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-analytics-collector:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: analytics-logs
+          name: contrail-logs
       - name: contrail-analytics-nodemgr
-        image: "opencontrailnightly/contrail-nodemgr:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-nodemgr:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
@@ -516,25 +521,40 @@ spec:
 #   type: Socket
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: analytics-logs
+          name: contrail-logs
         - mountPath: /mnt
           name: docker-unix-socket
+      - name: contrail-analytics-provisioner
+        image: "tungstenfabric/contrail-provisioner:latest"
+        imagePullPolicy: "IfNotPresent"
+        envFrom:
+        - configMapRef:
+            name: env
+        - configMapRef:
+            name: defaults-env
+        - configMapRef:
+            name: configzookeeperenv
+        - configMapRef:
+            name: nodemgr-config
+        env:
+        - name: NODE_TYPE
+          value: analytics
+        volumeMounts:
+        - mountPath: /var/log/contrail
+          name: contrail-logs
       imagePullSecrets:
       - name: 
       volumes:
-      - name: analytics-logs
-        hostPath:
-          path: /var/log/contrail/analytics
       - name: docker-unix-socket
         hostPath:
           path: /var/run
-      # - name: docker-unix-socket
-      #   hostPath:
-      #     path: /var/run/docker.sock
-      #     type: Socket
       - name: host-usr-bin
         hostPath:
           path: /usr/bin
+      - name: contrail-logs
+        hostPath:
+          path: /var/log/contrail
+
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -563,19 +583,16 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
-      - key: node.kubernetes.io/not-ready
-        operator: Exists
-        effect: NoSchedule
       hostNetwork: true
       initContainers:
       - name: contrail-node-init
-        image: "opencontrailnightly/contrail-node-init:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-node-init:latest"
+        imagePullPolicy: "IfNotPresent"
         env:
         - name: NODE_TYPE
           value: "analytics-snmp"
         - name: CONTRAIL_STATUS_IMAGE
-          value: "opencontrailnightly/contrail-status:latest"
+          value: "tungstenfabric/contrail-status:latest"
         envFrom:
         - configMapRef:
             name: env
@@ -590,8 +607,8 @@ spec:
           name: host-var-lib
       containers:
       - name: contrail-analytics-snmp-collector
-        image: "opencontrailnightly/contrail-analytics-snmp-collector:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-analytics-snmp-collector:latest"
+        imagePullPolicy: "IfNotPresent"
         securityContext:
           privileged: true
         envFrom:
@@ -599,13 +616,13 @@ spec:
             name: env
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: analytics-snmp-logs
+          name: contrail-logs
         env:
         - name: NODE_TYPE
           value: analytics-snmp
       - name: contrail-analytics-snmp-topology
-        image: "opencontrailnightly/contrail-analytics-snmp-topology:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-analytics-snmp-topology:latest"
+        imagePullPolicy: "IfNotPresent"
         securityContext:
           privileged: true
         envFrom:
@@ -613,13 +630,13 @@ spec:
             name: env
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: analytics-snmp-logs
+          name: contrail-logs
         env:
         - name: NODE_TYPE
           value: analytics-snmp
       - name: contrail-analytics-snmp-nodemgr
-        image: "opencontrailnightly/contrail-nodemgr:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-nodemgr:latest"
+        imagePullPolicy: "IfNotPresent"
         securityContext:
           privileged: true
         envFrom:
@@ -634,15 +651,35 @@ spec:
           value: analytics-snmp
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: analytics-snmp-logs
+          name: contrail-logs
         - mountPath: /mnt
           name: docker-unix-socket
+      - name: contrail-analytics-snmp-provisioner
+        image: "tungstenfabric/contrail-provisioner:latest"
+        imagePullPolicy: "IfNotPresent"
+        securityContext:
+          privileged: true
+        envFrom:
+        - configMapRef:
+            name: env
+        - configMapRef:
+            name: defaults-env
+        - configMapRef:
+            name: nodemgr-config
+        - configMapRef:
+            name: contrail-analyticsdb-config
+        env:
+        - name: NODE_TYPE
+          value: analytics-snmp
+        volumeMounts:
+        - mountPath: /var/log/contrail
+          name: contrail-logs
       imagePullSecrets:
       - name: 
       volumes:
-      - name: analytics-snmp-logs
+      - name: contrail-logs
         hostPath:
-          path: /var/log/contrail/analytics-snmp
+          path: /var/log/contrail
       - name: host-var-lib
         hostPath:
           path: /var/lib
@@ -680,19 +717,16 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
-      - key: node.kubernetes.io/not-ready
-        operator: Exists
-        effect: NoSchedule
       hostNetwork: true
       initContainers:
       - name: contrail-node-init
-        image: "opencontrailnightly/contrail-node-init:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-node-init:latest"
+        imagePullPolicy: "IfNotPresent"
         env:
         - name: NODE_TYPE
           value: "analytics-alarm"
         - name: CONTRAIL_STATUS_IMAGE
-          value: "opencontrailnightly/contrail-status:latest"
+          value: "tungstenfabric/contrail-status:latest"
         envFrom:
         - configMapRef:
             name: env
@@ -707,7 +741,7 @@ spec:
           name: host-var-lib
       containers:
       - name: kafka
-        image: "opencontrailnightly/contrail-external-kafka:latest"
+        image: "tungstenfabric/contrail-external-kafka:latest"
         imagePullPolicy: "IfNotPresent"
         securityContext:
           privileged: true
@@ -721,9 +755,12 @@ spec:
             name: env
         - configMapRef:
             name: configzookeeperenv
+        volumeMounts:
+        - mountPath: /var/log/kafka
+          name: kafka-logs
       - name: contrail-analytics-alarm-gen
-        image: "opencontrailnightly/contrail-analytics-alarm-gen:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-analytics-alarm-gen:latest"
+        imagePullPolicy: "IfNotPresent"
         securityContext:
           privileged: true
         envFrom:
@@ -733,13 +770,13 @@ spec:
             name: configzookeeperenv
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: analytics-alarm-logs
+          name: contrail-logs
         env:
         - name: NODE_TYPE
           value: analytics-alarm
       - name: contrail-analytics-alarm-nodemgr
-        image: "opencontrailnightly/contrail-nodemgr:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-nodemgr:latest"
+        imagePullPolicy: "IfNotPresent"
         securityContext:
           privileged: true
         envFrom:
@@ -754,15 +791,35 @@ spec:
           value: analytics-alarm
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: analytics-alarm-logs
+          name: contrail-logs
         - mountPath: /mnt
           name: docker-unix-socket
+      - name: contrail-analytics-alarm-provisioner
+        image: "tungstenfabric/contrail-provisioner:latest"
+        imagePullPolicy: "IfNotPresent"
+        securityContext:
+          privileged: true
+        envFrom:
+        - configMapRef:
+            name: env
+        - configMapRef:
+            name: defaults-env
+        - configMapRef:
+            name: contrail-analyticsdb-config
+        - configMapRef:
+            name: nodemgr-config
+        env:
+        - name: NODE_TYPE
+          value: analytics-alarm
+        volumeMounts:
+        - mountPath: /var/log/contrail
+          name: contrail-logs
       imagePullSecrets:
       - name: 
       volumes:
-      - name: analytics-alarm-logs
+      - name: contrail-logs
         hostPath:
-          path: /var/log/contrail/analytics-alarm
+          path: /var/log/contrail
       - name: host-var-lib
         hostPath:
           path: /var/lib
@@ -772,6 +829,9 @@ spec:
       - name: host-usr-bin
         hostPath:
           path: /usr/bin
+      - name: kafka-logs
+        hostPath:
+          path: /var/log/contrail/kafka
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -800,19 +860,16 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
-      - key: node.kubernetes.io/not-ready
-        operator: Exists
-        effect: NoSchedule
       hostNetwork: true
       initContainers:
       - name: contrail-node-init
-        image: "opencontrailnightly/contrail-node-init:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-node-init:latest"
+        imagePullPolicy: "IfNotPresent"
         securityContext:
           privileged: true
         env:
         - name: CONTRAIL_STATUS_IMAGE
-          value: "opencontrailnightly/contrail-status:latest"
+          value: "tungstenfabric/contrail-status:latest"
         envFrom:
         - configMapRef:
             name: env
@@ -821,17 +878,17 @@ spec:
           name: host-usr-bin
       containers:
       - name: contrail-controller-control
-        image: "opencontrailnightly/contrail-controller-control-control:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-controller-control-control:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: control-logs
+          name: contrail-logs
       - name: contrail-controller-control-dns
-        image: "opencontrailnightly/contrail-controller-control-dns:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-controller-control-dns:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
@@ -839,10 +896,10 @@ spec:
         - mountPath: /etc/contrail
           name: dns-config
         - mountPath: /var/log/contrail
-          name: control-logs
+          name: contrail-logs
       - name: contrail-controller-control-named
-        image: "opencontrailnightly/contrail-controller-control-named:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-controller-control-named:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
@@ -852,10 +909,10 @@ spec:
         - mountPath: /etc/contrail
           name: dns-config
         - mountPath: /var/log/contrail
-          name: control-logs
+          name: contrail-logs
       - name: contrail-controller-nodemgr
-        image: "opencontrailnightly/contrail-nodemgr:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-nodemgr:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
@@ -873,22 +930,36 @@ spec:
 #   type: Socket
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: control-logs
+          name: contrail-logs
         - mountPath: /mnt
           name: docker-unix-socket
+      - name: contrail-controller-provisioner
+        image: "tungstenfabric/contrail-provisioner:latest"
+        imagePullPolicy: "IfNotPresent"
+        envFrom:
+        - configMapRef:
+            name: env
+        - configMapRef:
+            name: defaults-env
+        - configMapRef:
+            name: configzookeeperenv
+        - configMapRef:
+            name: nodemgr-config
+        env:
+        - name: NODE_TYPE
+          value: control
+        volumeMounts:
+        - mountPath: /var/log/contrail
+          name: contrail-logs
       imagePullSecrets:
       - name: 
       volumes:
-      - name: control-logs
+      - name: contrail-logs
         hostPath:
-          path: /var/log/contrail/control
+          path: /var/log/contrail
       - name: docker-unix-socket
         hostPath:
           path: /var/run
-      # - name: docker-unix-socket
-      #   hostPath:
-      #     path: /var/run/docker.sock
-      #     type: Socket
       - name: dns-config
         emptyDir: {}
       - name: host-usr-bin
@@ -922,19 +993,16 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
-      - key: node.kubernetes.io/not-ready
-        operator: Exists
-        effect: NoSchedule
       hostNetwork: true
       initContainers:
       - name: contrail-node-init
-        image: "opencontrailnightly/contrail-node-init:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-node-init:latest"
+        imagePullPolicy: "IfNotPresent"
         securityContext:
           privileged: true
         env:
         - name: CONTRAIL_STATUS_IMAGE
-          value: "opencontrailnightly/contrail-status:latest"
+          value: "tungstenfabric/contrail-status:latest"
         envFrom:
         - configMapRef:
             name: env
@@ -943,8 +1011,8 @@ spec:
           name: host-usr-bin
       containers:
       - name: contrail-controller-config-api
-        image: "opencontrailnightly/contrail-controller-config-api:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-controller-config-api:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
@@ -952,10 +1020,10 @@ spec:
             name: configzookeeperenv
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: config-logs
+          name: contrail-logs
       - name: contrail-controller-config-devicemgr
-        image: "opencontrailnightly/contrail-controller-config-devicemgr:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-controller-config-devicemgr:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
@@ -963,10 +1031,10 @@ spec:
             name: configzookeeperenv
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: config-logs
+          name: contrail-logs
       - name: contrail-controller-config-schema
-        image: "opencontrailnightly/contrail-controller-config-schema:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-controller-config-schema:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
@@ -974,10 +1042,10 @@ spec:
             name: configzookeeperenv
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: config-logs
+          name: contrail-logs
       - name: contrail-controller-config-svcmonitor
-        image: "opencontrailnightly/contrail-controller-config-svcmonitor:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-controller-config-svcmonitor:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
@@ -985,10 +1053,10 @@ spec:
             name: configzookeeperenv
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: config-logs
+          name: contrail-logs
       - name: contrail-controller-config-nodemgr
-        image: "opencontrailnightly/contrail-nodemgr:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-nodemgr:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
@@ -1012,22 +1080,38 @@ spec:
 #   type: Socket
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: config-logs
+          name: contrail-logs
         - mountPath: /mnt
           name: docker-unix-socket
+      - name: contrail-controller-config-provisioner
+        image: "tungstenfabric/contrail-provisioner:latest"
+        imagePullPolicy: "IfNotPresent"
+        envFrom:
+        - configMapRef:
+            name: env
+        - configMapRef:
+            name: defaults-env
+        - configMapRef:
+            name: configzookeeperenv
+        - configMapRef:
+            name: nodemgr-config
+        env:
+        - name: NODE_TYPE
+          value: config
+        - name: CONFIG_NODEMGR__DEFAULTS__minimum_diskGB
+          value: "2"
+        volumeMounts:
+        - mountPath: /var/log/contrail
+          name: contrail-logs
       imagePullSecrets:
       - name: 
       volumes:
-      - name: config-logs
+      - name: contrail-logs
         hostPath:
-          path: /var/log/contrail/config
+          path: /var/log/contrail
       - name: docker-unix-socket
         hostPath:
           path: /var/run
-      # - name: docker-unix-socket
-      #   hostPath:
-      #     path: /var/run/docker.sock
-      #     type: Socket
       - name: host-usr-bin
         hostPath:
           path: /usr/bin
@@ -1059,19 +1143,16 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
-      - key: node.kubernetes.io/not-ready
-        operator: Exists
-        effect: NoSchedule
       hostNetwork: true
       initContainers:
       - name: contrail-node-init
-        image: "opencontrailnightly/contrail-node-init:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-node-init:latest"
+        imagePullPolicy: "IfNotPresent"
         securityContext:
           privileged: true
         env:
         - name: CONTRAIL_STATUS_IMAGE
-          value: "opencontrailnightly/contrail-status:latest"
+          value: "tungstenfabric/contrail-status:latest"
         envFrom:
         - configMapRef:
             name: env
@@ -1080,29 +1161,29 @@ spec:
           name: host-usr-bin
       containers:
       - name: contrail-controller-webui-job
-        image: "opencontrailnightly/contrail-controller-webui-job:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-controller-webui-job:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: webui-logs
+          name: contrail-logs
       - name: contrail-controller-webui-web
-        image: "opencontrailnightly/contrail-controller-webui-web:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-controller-webui-web:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: webui-logs
+          name: contrail-logs
       imagePullSecrets:
       - name: 
       volumes:
-      - name: webui-logs
+      - name: contrail-logs
         hostPath:
-          path: /var/log/contrail/webui
+          path: /var/log/contrail
       - name: host-usr-bin
         hostPath:
           path: /usr/bin
@@ -1137,14 +1218,11 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
-      - key: node.kubernetes.io/not-ready
-        operator: Exists
-        effect: NoSchedule
       hostNetwork: true
       containers:
       - name: redis
-        image: "opencontrailnightly/contrail-external-redis:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-external-redis:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
@@ -1188,17 +1266,18 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
-      - key: node.kubernetes.io/not-ready
-        operator: Exists
-        effect: NoSchedule
       hostNetwork: true
       containers:
       - name: rabbitmq
-        image: "opencontrailnightly/contrail-external-rabbitmq:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-external-rabbitmq:latest"
+        imagePullPolicy: "IfNotPresent"
         env:
         - name: NODE_TYPE
           value: config-database
+        - name: RABBITMQ_LOGS
+          value: '/var/log/rabbitmq/rabbitmq.log'
+        - name: RABBITMQ_SASL_LOGS
+          value: '/var/log/rabbitmq/rabbitmq_sasl.log'
         envFrom:
         - configMapRef:
             name: env
@@ -1253,13 +1332,13 @@ spec:
       hostNetwork: true
       initContainers:
       - name: contrail-node-init
-        image: "opencontrailnightly/contrail-node-init:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-node-init:latest"
+        imagePullPolicy: "IfNotPresent"
         securityContext:
           privileged: true
         env:
         - name: CONTRAIL_STATUS_IMAGE
-          value: "opencontrailnightly/contrail-status:latest"
+          value: "tungstenfabric/contrail-status:latest"
         envFrom:
         - configMapRef:
             name: env
@@ -1268,8 +1347,8 @@ spec:
           name: host-usr-bin
       containers:
       - name: contrail-kube-manager
-        image: "opencontrailnightly/contrail-kubernetes-kube-manager:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-kubernetes-kube-manager:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
@@ -1277,15 +1356,15 @@ spec:
             name: kube-manager-config
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: kube-manager-logs
+          name: contrail-logs
         - mountPath: /tmp/serviceaccount
           name: pod-secret
       imagePullSecrets:
       - name: 
       volumes:
-      - name: kube-manager-logs
+      - name: contrail-logs
         hostPath:
-          path: /var/log/contrail/kube-manager
+          path: /var/log/contrail
       - name: pod-secret
         secret:
           secretName: contrail-kube-manager-token
@@ -1329,13 +1408,13 @@ spec:
       hostNetwork: true
       initContainers:
       - name: contrail-node-init
-        image: "opencontrailnightly/contrail-node-init:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-node-init:latest"
+        imagePullPolicy: "IfNotPresent"
         securityContext:
           privileged: true
         env:
         - name: CONTRAIL_STATUS_IMAGE
-          value: "opencontrailnightly/contrail-status:latest"
+          value: "tungstenfabric/contrail-status:latest"
         envFrom:
         - configMapRef:
             name: env
@@ -1343,17 +1422,15 @@ spec:
         - mountPath: /host/usr/bin
           name: host-usr-bin
       - name: contrail-vrouter-kernel-init
-        # image: "opencontrailnightly/contrail-vrouter-kernel-init:latest"
-        image: "opencontrailnightly/contrail-vrouter-kernel-build-init:latest"
-        imagePullPolicy: ""
+        # image: "tungstenfabric/contrail-vrouter-kernel-build-init:latest"
+        image: "tungstenfabric/contrail-vrouter-kernel-build-init:latest"
+        imagePullPolicy: "IfNotPresent"
         securityContext:
           privileged: true
         envFrom:
         - configMapRef:
             name: env
         volumeMounts:
-        - mountPath: /host/etc
-          name: etc
         - mountPath: /usr/src
           name: usr-src
         - mountPath: /lib/modules
@@ -1363,14 +1440,12 @@ spec:
         - mountPath: /host/bin
           name: host-bin
       - name: contrail-kubernetes-cni-init
-        image: "opencontrailnightly/contrail-kubernetes-cni-init:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-kubernetes-cni-init:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
         volumeMounts:
-        - mountPath: /host/etc
-          name: etc
         - mountPath: /var/lib/contrail
           name: var-lib-contrail
         - mountPath: /host/etc_cni
@@ -1380,11 +1455,11 @@ spec:
         - mountPath: /host/log_cni
           name: var-log-contrail-cni
         - mountPath: /var/log/contrail
-          name: agent-logs
+          name: contrail-logs
       containers:
       - name: contrail-vrouter-agent
-        image: "opencontrailnightly/contrail-vrouter-agent:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-vrouter-agent:latest"
+        imagePullPolicy: "IfNotPresent"
         # TODO: Priveleged mode is requied because w/o it the device /dev/net/tun
         # is not present in the container. The mounting it into container
         # doesnt help because of permissions are not enough syscalls,
@@ -1401,14 +1476,12 @@ spec:
         volumeMounts:
         - mountPath: /dev
           name: dev
-        # - mountPath: /etc/sysconfig/network-scripts
-        #   name: network-scripts
-        - mountPath: /host/etc
-          name: etc
+        - mountPath: /etc/sysconfig/network-scripts
+          name: network-scripts
         - mountPath: /host/bin
           name: host-bin
         - mountPath: /var/log/contrail
-          name: agent-logs
+          name: contrail-logs
         - mountPath: /usr/src
           name: usr-src
         - mountPath: /lib/modules
@@ -1420,8 +1493,8 @@ spec:
         - mountPath: /tmp/serviceaccount
           name: pod-secret
       - name: contrail-agent-nodemgr
-        image: "opencontrailnightly/contrail-nodemgr:latest"
-        imagePullPolicy: ""
+        image: "tungstenfabric/contrail-nodemgr:latest"
+        imagePullPolicy: "IfNotPresent"
         envFrom:
         - configMapRef:
             name: env
@@ -1437,15 +1510,30 @@ spec:
 #   type: Socket
         volumeMounts:
         - mountPath: /var/log/contrail
-          name: agent-logs
+          name: contrail-logs
         - mountPath: /mnt
           name: docker-unix-socket
+        - mountPath: /var/lib/contrail/loadbalancer
+          name: lb-nodemgr
+      - name: contrail-agent-provisioner
+        image: "tungstenfabric/contrail-provisioner:latest"
+        imagePullPolicy: "IfNotPresent"
+        envFrom:
+        - configMapRef:
+            name: env
+        - configMapRef:
+            name: defaults-env
+        - configMapRef:
+            name: nodemgr-config
+        env:
+        - name: NODE_TYPE
+          value: vrouter
+        volumeMounts:
+        - mountPath: /var/log/contrail
+          name: contrail-logs
       imagePullSecrets:
       - name: 
       volumes:
-      - name: etc
-        hostPath:
-          path: /etc
       - name: dev
         hostPath:
           path: /dev
@@ -1458,10 +1546,6 @@ spec:
       - name: docker-unix-socket
         hostPath:
           path: /var/run
-      # - name: docker-unix-socket
-      #   hostPath:
-      #     path: /var/run/docker.sock
-      #     type: Socket
       - name: pod-secret
         secret:
           secretName: contrail-kube-manager-token
@@ -1486,13 +1570,15 @@ spec:
       - name: var-log-contrail-cni
         hostPath:
           path: /var/log/contrail/cni
-      - name: agent-logs
+      - name: contrail-logs
         hostPath:
-          path: /var/log/contrail/agent
+          path: /var/log/contrail
       - name: host-usr-bin
         hostPath:
           path: /usr/bin
-
+      - name: lb-nodemgr
+        hostPath:
+          path: /var/lib/contrail/loadbalancer
 # Meta information section
 ---
 kind: ClusterRole
