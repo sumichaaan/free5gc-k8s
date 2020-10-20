@@ -10,7 +10,7 @@ bootstrapTokens:
   - signing
   - authentication
 localAPIEndpoint:
-  advertiseAddress: 192.168.31.61
+  advertiseAddress: {{ K8S_API_ADVERTISE_ADDRESS }}
   bindPort: 6443
 nodeRegistration:
   name: tf01
@@ -33,8 +33,8 @@ dns:
   type: CoreDNS
 networking:
   dnsDomain: cluster.local
-  podSubnet: 172.20.0.0/16
-  serviceSubnet: 10.96.0.0/12
+  podSubnet: {{ K8S_POD_SUBNET }}
+  serviceSubnet: {{ K8S_SERVICE_SUBNET }}
 apiServer:
   extraArgs:
     authorization-mode: "Node,RBAC"
@@ -47,8 +47,6 @@ scheduler: {}
 certificatesDir: /etc/kubernetes/pki
 imageRepository: k8s.gcr.io
 kubernetesVersion: v1.19.3
-# kubernetesVersion: v1.18.10
-# kubernetesVersion: v1.14.10
 useHyperKubeImage: false
 clusterName: ool5g
 
@@ -62,7 +60,7 @@ clientConnection:
   contentType: ""
   kubeconfig: /var/lib/kube-proxy/kubeconfig.conf
   qps: 0
-clusterCIDR: 172.20.0.0/16
+clusterCIDR: ${{ K8S_POD_SUBNET }}
 configSyncPeriod: 0s
 conntrack:
   maxPerCore: null
@@ -111,7 +109,7 @@ authorization:
     cacheAuthorizedTTL: 0s
     cacheUnauthorizedTTL: 0s
 clusterDNS:
-- 10.96.0.10
+- ${{ K8S_CLUSTER_DNS_IP }}
 clusterDomain: cluster.local
 cpuManagerReconcilePeriod: 0s
 evictionPressureTransitionPeriod: 0s
