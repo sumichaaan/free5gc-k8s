@@ -2,7 +2,7 @@ apiVersion: kubeadm.k8s.io/v1beta2
 caCertPath: /etc/kubernetes/pki/ca.crt
 discovery:
   bootstrapToken:
-    apiServerEndpoint: {{ __K8S_API_ADVERTISE_ADDRESS__ }}:6443
+    apiServerEndpoint: {{ K8S_API_ADVERTISE_ADDRESS }}:6443
     token: nq9nmo.qmqa3fndev38vnvq
     caCertHashes:
     - sha256:a5dcbe50f14bb15073dfde160dc7b0941bde6c184d460590948ec0ec31c67f41

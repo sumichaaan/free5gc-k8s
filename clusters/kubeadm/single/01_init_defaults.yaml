@@ -109,7 +109,7 @@ authorization:
     cacheAuthorizedTTL: 0s
     cacheUnauthorizedTTL: 0s
 clusterDNS:
-- ${{ K8S_CLUSTER_DNS_IP }}
+- {{ K8S_CLUSTER_DNS_ADDRESS }}
 clusterDomain: cluster.local
 cpuManagerReconcilePeriod: 0s
 evictionPressureTransitionPeriod: 0s
