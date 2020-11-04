@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mongo-express
+  name: mongo-express
+spec:
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels:
+        app: mongo-express
+    spec:
+      containers:
+      - env:
+        - name: ME_CONFIG_MONGODB_SERVER
+          value: "f5gc-mongodb.f5gc.svc.cluster.local"
+        - name: ME_CONFIG_MONGODB_ENABLE_ADMIN
+          value: "true"
+        - name: ME_CONFIG_BASICAUTH_USERNAME
+          value: "admin"
+        - name: ME_CONFIG_BASICAUTH_PASSWORD
+          value: "free5gc"
+        image: mongo-express:latest
+        imagePullPolicy: Always
+        name: mongo-express
+        ports:
+        - containerPort: 8081
+          protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mongo-express
+  name: mongo-express
+  namespace: f5gc
+spec:
+  ports:
+  - name: http
+    port: 8081
+    protocol: TCP
+  selector:
+    app: mongo-express
+  type: NodePort
