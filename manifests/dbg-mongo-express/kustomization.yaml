@@ -1,0 +1,4 @@
+resources:
+  - 00_dbg-me-deployment.yaml
+
+namespace: f5gc
