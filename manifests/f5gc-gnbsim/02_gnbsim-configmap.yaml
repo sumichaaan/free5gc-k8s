@@ -44,7 +44,8 @@ data:
                             "sst": 1,
                             "sd": "010203"
                     },
-                    "dnn": "internet"
+                    "dnn": "internet",
+                    "url": "http://localhost/"
             },
             "ULInfoNR": {
                     "NRCGI": {

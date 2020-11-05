@@ -45,6 +45,12 @@ spec:
             - containerPort: 2152
               name: if-n3
               protocol: UDP
+        - name: f5gc-gnbsim-probe
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+              name: http-probe
+              protocol: TCP
         - name: tcpdump
           image: corfr/tcpdump
           command:
