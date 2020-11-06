@@ -37,109 +37,149 @@ build-all: build-base build-gnbsim build-amf build-smf build-upf build-nrf build
 .PHONY: build-base
 build-base:
 	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
-                    --tag ${BASE_IMAGE_NAME} \
-                    --file ./images/${F5GC_BASE_NAME}/Dockerfile.alpine \
-                    ./images/${F5GC_BASE_NAME}
+		--tag ${BASE_IMAGE_NAME} \
+		--file ./images/${F5GC_BASE_NAME}/Dockerfile.alpine \
+		./images/${F5GC_BASE_NAME}
 
 .PHONY: build-gnbsim
 build-gnbsim:
 	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
-                    --tag ${GNBSIM_IMAGE_NAME} \
-                    --file ./images/${F5GC_GNBSIM_NAME}/Dockerfile.ubuntu18 \
-                    --build-arg REGISTRY=${DOCKER_REGISTRY} \
-                    --build-arg REPOSITORY=${DOCKER_REPOSITORY} \
-                    --build-arg TAG=${DOCKER_TAG} \
-                    ./images/${F5GC_GNBSIM_NAME}
+		--tag ${GNBSIM_IMAGE_NAME} \
+		--file ./images/${F5GC_GNBSIM_NAME}/Dockerfile.ubuntu18 \
+		--build-arg REGISTRY=${DOCKER_REGISTRY} \
+		--build-arg REPOSITORY=${DOCKER_REPOSITORY} \
+		--build-arg TAG=${DOCKER_TAG} \
+		./images/${F5GC_GNBSIM_NAME}
 
 .PHONY: build-amf
 build-amf: build-base
 	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
-                    --tag ${AMF_IMAGE_NAME} \
-                    --file ./images/${F5GC_AMF_NAME}/Dockerfile.alpine \
-                    --build-arg REGISTRY=${DOCKER_REGISTRY} \
-                    --build-arg REPOSITORY=${DOCKER_REPOSITORY} \
-                    --build-arg TAG=${DOCKER_TAG} \
-                    ./images/${F5GC_AMF_NAME}
+		--tag ${AMF_IMAGE_NAME} \
+		--file ./images/${F5GC_AMF_NAME}/Dockerfile.alpine \
+		--build-arg REGISTRY=${DOCKER_REGISTRY} \
+		--build-arg REPOSITORY=${DOCKER_REPOSITORY} \
+		--build-arg TAG=${DOCKER_TAG} \
+		./images/${F5GC_AMF_NAME}
 
 .PHONY: build-smf
 build-smf: build-base
 	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
-                    --tag ${SMF_IMAGE_NAME} \
-                    --file ./images/${F5GC_SMF_NAME}/Dockerfile.alpine \
-                    --build-arg REGISTRY=${DOCKER_REGISTRY} \
-                    --build-arg REPOSITORY=${DOCKER_REPOSITORY} \
-                    --build-arg TAG=${DOCKER_TAG} \
-                    ./images/${F5GC_SMF_NAME}
+		--tag ${SMF_IMAGE_NAME} \
+		--file ./images/${F5GC_SMF_NAME}/Dockerfile.alpine \
+		--build-arg REGISTRY=${DOCKER_REGISTRY} \
+		--build-arg REPOSITORY=${DOCKER_REPOSITORY} \
+		--build-arg TAG=${DOCKER_TAG} \
+		./images/${F5GC_SMF_NAME}
 
 .PHONY: build-upf
 build-upf: build-base
 	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
-                    --tag ${UPF_IMAGE_NAME} \
-                    --file ./images/${F5GC_UPF_NAME}/Dockerfile.ubuntu18 \
-                    --build-arg REGISTRY=${DOCKER_REGISTRY} \
-                    --build-arg REPOSITORY=${DOCKER_REPOSITORY} \
-                    --build-arg TAG=${DOCKER_TAG} \
-                    ./images/${F5GC_UPF_NAME}
+		--tag ${UPF_IMAGE_NAME} \
+		--file ./images/${F5GC_UPF_NAME}/Dockerfile.ubuntu18 \
+		--build-arg REGISTRY=${DOCKER_REGISTRY} \
+		--build-arg REPOSITORY=${DOCKER_REPOSITORY} \
+		--build-arg TAG=${DOCKER_TAG} \
+		./images/${F5GC_UPF_NAME}
 
 .PHONY: build-nrf
 build-nrf: build-base
 	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
-                    --tag ${NRF_IMAGE_NAME} \
-                    --file ./images/${F5GC_NRF_NAME}/Dockerfile.alpine \
-                    --build-arg REGISTRY=${DOCKER_REGISTRY} \
-                    --build-arg REPOSITORY=${DOCKER_REPOSITORY} \
-                    --build-arg TAG=${DOCKER_TAG} \
-                    ./images/${F5GC_NRF_NAME}
+		--tag ${NRF_IMAGE_NAME} \
+		--file ./images/${F5GC_NRF_NAME}/Dockerfile.alpine \
+		--build-arg REGISTRY=${DOCKER_REGISTRY} \
+		--build-arg REPOSITORY=${DOCKER_REPOSITORY} \
+		--build-arg TAG=${DOCKER_TAG} \
+		./images/${F5GC_NRF_NAME}
 
 .PHONY: build-ausf
 build-ausf: build-base
 	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
-                    --tag ${AUSF_IMAGE_NAME} \
-                    --file ./images/${F5GC_AUSF_NAME}/Dockerfile.alpine \
-                    --build-arg REGISTRY=${DOCKER_REGISTRY} \
-                    --build-arg REPOSITORY=${DOCKER_REPOSITORY} \
-                    --build-arg TAG=${DOCKER_TAG} \
-                    ./images/${F5GC_AUSF_NAME}
+		--tag ${AUSF_IMAGE_NAME} \
+		--file ./images/${F5GC_AUSF_NAME}/Dockerfile.alpine \
+		--build-arg REGISTRY=${DOCKER_REGISTRY} \
+		--build-arg REPOSITORY=${DOCKER_REPOSITORY} \
+		--build-arg TAG=${DOCKER_TAG} \
+		./images/${F5GC_AUSF_NAME}
 
 .PHONY: build-nssf
 build-nssf: build-base
-        ${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
-                    --tag ${NSSF_IMAGE_NAME} \
-                    --file ./images/${F5GC_NSSF_NAME}/Dockerfile.alpine \
-                    --build-arg REGISTRY=${DOCKER_REGISTRY} \
-                    --build-arg REPOSITORY=${DOCKER_REPOSITORY} \
-                    --build-arg TAG=${DOCKER_TAG} \
-                    ./images/${F5GC_NSSF_NAME}
+	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
+		--tag ${NSSF_IMAGE_NAME} \
+		--file ./images/${F5GC_NSSF_NAME}/Dockerfile.alpine \
+		--build-arg REGISTRY=${DOCKER_REGISTRY} \
+		--build-arg REPOSITORY=${DOCKER_REPOSITORY} \
+		--build-arg TAG=${DOCKER_TAG} \
+		./images/${F5GC_NSSF_NAME}
 
 .PHONY: build-pcf
 build-pcf: build-base
-        ${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
-                    --tag ${PCF_IMAGE_NAME} \
-                    --file ./images/${F5GC_PCF_NAME}/Dockerfile.alpine \
-                    --build-arg REGISTRY=${DOCKER_REGISTRY} \
-                    --build-arg REPOSITORY=${DOCKER_REPOSITORY} \
-                    --build-arg TAG=${DOCKER_TAG} \
-                    ./images/${F5GC_PCF_NAME}
+	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
+		--tag ${PCF_IMAGE_NAME} \
+		--file ./images/${F5GC_PCF_NAME}/Dockerfile.alpine \
+		--build-arg REGISTRY=${DOCKER_REGISTRY} \
+		--build-arg REPOSITORY=${DOCKER_REPOSITORY} \
+		--build-arg TAG=${DOCKER_TAG} \
+		./images/${F5GC_PCF_NAME}
 
 .PHONY: build-udm
 build-udm: build-base
-        ${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
-                    --tag ${UDM_IMAGE_NAME} \
-                    --file ./images/${F5GC_UDM_NAME}/Dockerfile.alpine \
-                    --build-arg REGISTRY=${DOCKER_REGISTRY} \
-                    --build-arg REPOSITORY=${DOCKER_REPOSITORY} \
-                    --build-arg TAG=${DOCKER_TAG} \
-                    ./images/${F5GC_UDM_NAME}
+	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
+		--tag ${UDM_IMAGE_NAME} \
+		--file ./images/${F5GC_UDM_NAME}/Dockerfile.alpine \
+		--build-arg REGISTRY=${DOCKER_REGISTRY} \
+		--build-arg REPOSITORY=${DOCKER_REPOSITORY} \
+		--build-arg TAG=${DOCKER_TAG} \
+		./images/${F5GC_UDM_NAME}
 
 .PHONY: build-udr
 build-udr: build-base
-        ${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
-                    --tag ${UDR_IMAGE_NAME} \
-                    --file ./images/${F5GC_UDR_NAME}/Dockerfile.alpine \
-                    --build-arg REGISTRY=${DOCKER_REGISTRY} \
-                    --build-arg REPOSITORY=${DOCKER_REPOSITORY} \
-                    --build-arg TAG=${DOCKER_TAG} \
-                    ./images/${F5GC_UDR_NAME}
+	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
+		--tag ${UDR_IMAGE_NAME} \
+		--file ./images/${F5GC_UDR_NAME}/Dockerfile.alpine \
+		--build-arg REGISTRY=${DOCKER_REGISTRY} \
+		--build-arg REPOSITORY=${DOCKER_REPOSITORY} \
+		--build-arg TAG=${DOCKER_TAG} \
+		./images/${F5GC_UDR_NAME}
+
+.PHONY: build-nssf
+build-nssf: build-base
+	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
+		--tag ${NSSF_IMAGE_NAME} \
+		--file ./images/${F5GC_NSSF_NAME}/Dockerfile.alpine \
+		--build-arg REGISTRY=${DOCKER_REGISTRY} \
+		--build-arg REPOSITORY=${DOCKER_REPOSITORY} \
+		--build-arg TAG=${DOCKER_TAG} \
+		./images/${F5GC_NSSF_NAME}
+
+.PHONY: build-pcf
+build-pcf: build-base
+	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
+		--tag ${PCF_IMAGE_NAME} \
+		--file ./images/${F5GC_PCF_NAME}/Dockerfile.alpine \
+		--build-arg REGISTRY=${DOCKER_REGISTRY} \
+		--build-arg REPOSITORY=${DOCKER_REPOSITORY} \
+		--build-arg TAG=${DOCKER_TAG} \
+		./images/${F5GC_PCF_NAME}
+
+.PHONY: build-udm
+build-udm: build-base
+	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
+		--tag ${UDM_IMAGE_NAME} \
+		--file ./images/${F5GC_UDM_NAME}/Dockerfile.alpine \
+		--build-arg REGISTRY=${DOCKER_REGISTRY} \
+		--build-arg REPOSITORY=${DOCKER_REPOSITORY} \
+		--build-arg TAG=${DOCKER_TAG} \
+		./images/${F5GC_UDM_NAME}
+
+.PHONY: build-udr
+build-udr: build-base
+	${DOCKER_ENV} docker build ${DOCKER_BUILD_ARGS} \
+		--tag ${UDR_IMAGE_NAME} \
+		--file ./images/${F5GC_UDR_NAME}/Dockerfile.alpine \
+		--build-arg REGISTRY=${DOCKER_REGISTRY} \
+		--build-arg REPOSITORY=${DOCKER_REPOSITORY} \
+		--build-arg TAG=${DOCKER_TAG} \
+		./images/${F5GC_UDR_NAME}
 
 clean:
 	docker rmi ${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}/${F5GC_BASE_NAME}:${DOCKER_TAG}
