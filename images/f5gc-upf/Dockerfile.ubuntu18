@@ -1,4 +1,4 @@
-FROM local/f5gc-build-base:v3.0.4 AS builder
+FROM ghcr.io/sumichaaan/free5gc-k8s/f5gc-build-base:v3.0.4 AS builder
 FROM ubuntu:18.04
 
 LABEL description="Free5GC open source 5G Core Network" \
