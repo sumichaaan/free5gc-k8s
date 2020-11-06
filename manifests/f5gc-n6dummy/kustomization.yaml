@@ -1,0 +1,7 @@
+resources:
+  - 00_n6dummy-sa.yaml
+  - 01_n6dummy-rbac.yaml
+  - 02_n6dummy-multus.yaml
+  - 03_n6dummy-deployment.yaml
+
+namespace: f5gc
