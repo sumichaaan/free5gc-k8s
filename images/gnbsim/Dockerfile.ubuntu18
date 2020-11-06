@@ -1,5 +1,8 @@
 FROM golang:1.14.4-stretch AS builder
 
+LABEL maintainer="Yoshifumi Sumida <yoshifumi.sumida@gmail.com>"
+LABEL org.opencontainers.image.source https://github.com/sumichaaan/free5gc-k8s
+
 RUN apt-get update && \
     apt-get install -y \
         gcc \

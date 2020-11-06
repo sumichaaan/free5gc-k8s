@@ -3,6 +3,7 @@ FROM alpine:3.8
 
 LABEL description="Free5GC open source 5G Core Network" \
     version="Stage 3"
+LABEL org.opencontainers.image.source https://github.com/sumichaaan/free5gc-k8s
 
 ENV F5GC_MODULE nrf
 ARG DEBUG_TOOLS

@@ -1,6 +1,7 @@
 FROM ubuntu:18.04
 
 LABEL maintainer="Yoshifumi Sumida <yoshifumi.sumida@gmail.com>"
+LABEL org.opencontainers.image.source https://github.com/sumichaaan/free5gc-k8s
 
 ARG GIT_TAG=latest
 LABEL name="free5gc" \

@@ -1,5 +1,6 @@
 FROM local/f5gc-build-base:v3.0.4 AS builder
 LABEL maintainer="Yoshifumi Sumida <yoshifumi.sumida@gmail.com>"
+LABEL org.opencontainers.image.source https://github.com/sumichaaan/free5gc-k8s
 
 FROM gcr.io/distroless/base:debug
 
