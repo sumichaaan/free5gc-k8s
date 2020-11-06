@@ -23,7 +23,7 @@ spec:
         runAsGroup: 0
       containers:
         - name: f5gc-gnbsim
-          image: local/f5gc-gnbsim:v3.0.4
+          image: ghcr.io/sumichaaan/free5gc-k8s//f5gc-gnbsim:v3.0.4
           imagePullPolicy: IfNotPresent
           # imagePullPolicy: Always
           command: ["sh"]

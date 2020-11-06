@@ -21,7 +21,7 @@ spec:
         runAsGroup: 0
       containers:
         - name: f5gc-nssf
-          image: local/f5gc-nssf:v3.0.4
+          image: ghcr.io/sumichaaan/free5gc-k8s/f5gc-nssf:v3.0.4
           imagePullPolicy: IfNotPresent
           # imagePullPolicy: Always
           securityContext:
