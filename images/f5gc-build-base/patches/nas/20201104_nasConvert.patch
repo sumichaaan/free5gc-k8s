@@ -1,0 +1,21 @@
+diff --git a/nasConvert/Nssai.go b/nasConvert/Nssai.go
+index fd4665d..838eec9 100644
+--- a/nasConvert/Nssai.go
++++ b/nasConvert/Nssai.go
+@@ -35,6 +35,16 @@ func requestedSnssaiToModels(buf []byte) (snssai models.Snssai, length int) {
+                snssai.Sst = int32(buf[1])
+                snssai.Sd = hex.EncodeToString(buf[2:5])
+                length = 5
++       case 0x08: // sst + sd + mapped hplmn sst + mapped hplmn sd
++               snssai.Sst = int32(buf[1])
++               snssai.Sd = hex.EncodeToString(buf[2:5])
++               // Not Implemented
++               // TS 29.531 / 6.1.6.2.8 Type: MappingOfSnssai
++               // var mappingOfSnssai models.MappingOfSnssai
++               // mappingOfSnssai.ServingSnssai = snssai
++               // mappingOfSnssai.HomeSnssai.Sst = int(buf[5])
++               // mappingOfSnssai.HomeSnssai.Sd = hexEncodeToString(buf[6:9])
++               length = 9
+        default:
+                fmt.Printf("Not Supported length: %d\n", lengthOfSnssaiContents)
+        }

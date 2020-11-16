@@ -16,6 +16,21 @@ RUN cd $GOPATH/src \
 
 COPY Makefile $GOPATH/src/free5gc/Makefile
 
+# Patch Free5GC v3.0.4 (TODO: Separate it as Script files)
+# 20201104_nasConvert: Temporary Fix to correspond for Mapped NSSAI which is have not been implemented in current free5gc
+#   Ref: .
+# 20201110_nrf_smf_selection_by_slice: SMF Selection by S-NSSAI in AMF have not been implemented in current free5gc
+#   Ref: https://github.com/free5gc/free5gc/issues/103
+
+COPY patches/ $GOPATH/src/free5gc/patches/
+RUN cd $GOPATH/src/free5gc && \
+    cp patches/nas/20201104_nasConvert.patch lib/nas && \
+    cp patches/nrf/20201110_nrf_smf_selection_by_slice.patch src/nrf && \
+    cd $GOPATH/src/free5gc/lib/nas && \
+    git apply --ignore-whitespace 20201104_nasConvert.patch && \
+    cd $GOPATH/src/free5gc/src/nrf && \
+    git apply --ignore-whitespace 20201110_nrf_slice_bugfix.patch
+
 # Build NFs (AMF, AUSF, N3IWF, NRF, NSSF, PCF, SMF, UDM, UDR, UPF)
 RUN cd $GOPATH/src/free5gc \
     && make all
