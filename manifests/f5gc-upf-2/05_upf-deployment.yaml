@@ -33,9 +33,9 @@ spec:
           imagePullPolicy: IfNotPresent
           # imagePullPolicy: Always
           securityContext:
-            privileged: true
+            privileged: false
             capabilities:
-              add: ["NET_ADMIN", "SYS_TIME"]
+              add: ["NET_ADMIN", "NET_RAW", "NET_BIND_SERVICE", "SYS_TIME"]
           volumeMounts:
             - name: f5gc-upf-config
               mountPath: /free5gc/config
