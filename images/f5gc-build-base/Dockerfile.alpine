@@ -29,7 +29,7 @@ RUN cd $GOPATH/src/free5gc && \
     cd $GOPATH/src/free5gc/lib/nas && \
     git apply --ignore-whitespace 20201104_nasConvert.patch && \
     cd $GOPATH/src/free5gc/src/nrf && \
-    git apply --ignore-whitespace 20201110_nrf_slice_bugfix.patch
+    git apply --ignore-whitespace 20201110_nrf_smf_selection_by_slice.patch
 
 # Build NFs (AMF, AUSF, N3IWF, NRF, NSSF, PCF, SMF, UDM, UDR, UPF)
 RUN cd $GOPATH/src/free5gc \
