@@ -51,6 +51,7 @@ build-gnbsim:
 		--build-arg REGISTRY=${DOCKER_REGISTRY} \
 		--build-arg REPOSITORY=${DOCKER_REPOSITORY} \
 		--build-arg TAG=${DOCKER_TAG} \
+		--no-cache \
 		./images/${F5GC_GNBSIM_NAME}
 
 .PHONY: build-amf
