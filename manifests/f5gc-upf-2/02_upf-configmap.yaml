@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: f5gc-upf-config-2
+data:
+  upfcfg.yaml: |
+    info:
+      version: 1.0.0
+      description: UPF configuration
+    
+    configuration:
+      # debugLevel: panic|fatal|error|warn|info|debug|trace
+      debugLevel: info
+      # ReportCaller: true|false
+      ReportCaller: false
+    
+      pfcp:
+        - addr: 172.16.30.31
+    
+      gtpu:
+        - addr: 192.168.10.21
+        # [optional] gtpu.name
+        # - name: upf.5gc.nctu.me
+        # [optional] gtpu.ifname
+        # - ifname: gtpif
+    
+      dnn_list:
+        - dnn: internet
+          cidr: 172.16.1.0/24
+          # [optional] apn_list[*].natifname
+          # natifname: eth0

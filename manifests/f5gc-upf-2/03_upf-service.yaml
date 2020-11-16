@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: f5gc-upf-2
+  name: f5gc-upf-2
+spec:
+  type: ClusterIP
+  ports:
+  - name: f5gc-upf-n3
+    port: 2152
+    protocol: UDP
+    targetPort: 2152
+  - name: f5gc-upf-n4
+    port:  8805
+    protocol: UDP
+    targetPort: 8805
+  selector:
+    app: f5gc-upf-2

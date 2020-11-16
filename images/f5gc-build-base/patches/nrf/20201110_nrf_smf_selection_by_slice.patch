@@ -1,11 +1,13 @@
 diff --git a/producer/nf_discovery.go b/producer/nf_discovery.go
-index 4faf116..ca5f4bb 100644
+index 4faf116..142a980 100644
 --- a/producer/nf_discovery.go
 +++ b/producer/nf_discovery.go
-@@ -315,12 +315,24 @@ func buildFilter(queryParameters url.Values) bson.M {
+@@ -314,12 +314,24 @@ func buildFilter(queryParameters url.Values) bson.M {
+                                        logger.DiscoveryLog.Warnln("Unmarshal Error in snssaiBsonM", err)
                                 }
 
-                                snssaisBsonArray = append(snssaisBsonArray, bson.M{"sNssais": bson.M{"$elemMatch": snssaiBsonM}})
+-                               snssaisBsonArray = append(snssaisBsonArray, bson.M{"sNssais": bson.M{"$elemMatch": snssaiBsonM}})
++                               // snssaisBsonArray = append(snssaisBsonArray, bson.M{"sNssais": bson.M{"$elemMatch": snssaiBsonM}})
 +
 +                                if targetNfType == "SMF" {
 +                                        snssaisBsonArray = append(snssaisBsonArray, bson.M{"smfInfo.sNssaiSmfInfoList": bson.M{"$elemMatch": bson.M{"sNssai": snssaiBsonM}}})
@@ -16,14 +18,14 @@ index 4faf116..ca5f4bb 100644
                 }
 
                 // if not assign, serve all NF
-                snssaisBsonArray = append(snssaisBsonArray, bson.M{"sNssais": bson.M{"$exists": false}})
-
+-               snssaisBsonArray = append(snssaisBsonArray, bson.M{"sNssais": bson.M{"$exists": false}})
++               // snssaisBsonArray = append(snssaisBsonArray, bson.M{"sNssais": bson.M{"$exists": false}})
++
 +                if targetNfType == "SMF" {
 +                        snssaisBsonArray = append(snssaisBsonArray, bson.M{"smfInfo.sNssaiSmfInfoList": bson.M{"sNssai": bson.M{"$exists": false}}})
 +                } else {
 +                        snssaisBsonArray = append(snssaisBsonArray, bson.M{"sNssais": bson.M{"$exists": false}})
 +                }
-+
+
                 snssaisFilter := bson.M{
                         "$or": snssaisBsonArray,
-                }

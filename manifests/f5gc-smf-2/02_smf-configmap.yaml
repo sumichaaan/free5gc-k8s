@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: f5gc-smf-config
+  name: f5gc-smf-config-2
 data:
   smfcfg.conf: |
     info:
@@ -9,10 +9,10 @@ data:
       description: AMF initial local configuration
     
     configuration:
-      smfName: SMF
+      smfName: SMF2
       sbi:
         scheme: http
-        registerIPv4: f5gc-smf
+        registerIPv4: f5gc-smf-2
         bindingIPv4: 0.0.0.0 
         port: 29502
         tls:
@@ -22,29 +22,29 @@ data:
         - nsmf-pdusession
         - nsmf-event-exposure
       snssai_info:
-        - sNssai:
-            sst: 1
-            sd: 010203
-          dnnSmfInfoList:
-            - dnn: internet
         # - sNssai:
         #     sst: 1
-        #     sd: 112233
+        #     sd: 010203
         #   dnnSmfInfoList:
         #     - dnn: internet
+        - sNssai:
+            sst: 1
+            sd: 112233
+          dnnSmfInfoList:
+            - dnn: internet
       pfcp:
-        addr: 172.16.30.20
+        addr: 172.16.30.21
       userplane_information:
         up_nodes:
           gNB1:
             type: AN
             an_ip: 192.168.10.10
-          UPF1:
+          UPF2:
             type: UPF
-            node_id: 172.16.30.30
+            node_id: 172.16.30.31
         links:
           - A: gNB1
-            B: UPF1
+            B: UPF2
       dnn:
         internet:
           dns:
@@ -92,11 +92,10 @@ data:
             UPF: !!seq
               - BranchingUPF
               - AnchorUPF2
-
     # routeProfile:
     #   MEC1:
     #     forwardingPolicyID: 10
-    #
+    # 
     # pfdDataForApp:
     #   - applicationId: edge
     #     pfds:

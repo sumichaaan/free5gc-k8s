@@ -1,0 +1,19 @@
+resources:
+  - 00_smf-sa.yaml
+  - 01_smf-rbac.yaml
+  - 02_smf-configmap.yaml
+  - 03_smf-service.yaml
+  - 04_smf-multus.yaml
+  - 05_smf-deployment.yaml
+
+namespace: f5gc
+
+secretGenerator:
+- name: f5gc-smf-tls-secret-2
+  namespace: free5gc
+  files:
+  - cert/smf.pem
+  - cert/smf.key
+  type: "Opaque"
+generatorOptions:
+  disableNameSuffixHash: true

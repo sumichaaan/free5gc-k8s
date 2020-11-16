@@ -1,9 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: f5gc-nrf
+  name: f5gc-upf-2
   labels:
-    app: f5gc-nrf
+    app: f5gc-upf-2
+    sliceidx: f2755a68-e24a-4112-8931-ffad4bafa0e2
   annotations:
     free5gc.org/nssi-id: '27394d25-dbf5-428e-8fc3-f5b2add67115'
     free5gc.org/nsi-ids: '[
@@ -13,48 +14,54 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: f5gc-nrf
+      app: f5gc-upf-2
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: f5gc-nrf
+        app: f5gc-upf-2
+      annotations:
+        k8s.v1.cni.cncf.io/networks: f5gc-upf-2-n3, f5gc-upf-2-n4, f5gc-upf-2-n6
     spec:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
       containers:
-        - name: f5gc-nrf
-          image: ghcr.io/sumichaaan/free5gc-k8s/f5gc-nrf:v3.0.4
+        - name: f5gc-upf
+          image: ghcr.io/sumichaaan/free5gc-k8s/f5gc-upf:v3.0.4
           imagePullPolicy: IfNotPresent
           # imagePullPolicy: Always
           securityContext:
-            privileged: false
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_TIME"]
           volumeMounts:
-            - name: f5gc-nrf-config
+            - name: f5gc-upf-config
               mountPath: /free5gc/config
-            - name: f5gc-nrf-cert
-              mountPath: /free5gc/support/TLS
+            - mountPath: /dev/net/tun
+              name: tun-devdir
           ports:
-            - containerPort: 29510
-              name: f5gc-nrf
-              protocol: TCP
+            - containerPort: 2152
+              name: if-n3
+              protocol: UDP
+            - containerPort: 8805
+              name: if-n4
+              protocol: UDP
         - name: tcpdump
           image: corfr/tcpdump
-          imagePullPolicy: IfNotPresent
           command:
             - /bin/sleep
             - infinity
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      serviceAccountName: f5gc-nrf-sa
+      serviceAccountName: f5gc-upf-sa
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: f5gc-nrf-cert
-          secret:
-            secretName: f5gc-nrf-tls-secret
-        - name: f5gc-nrf-config
+        - name: f5gc-upf-config
           configMap:
-            name: f5gc-nrf-config
+            name: f5gc-upf-config-2
+        - name: tun-devdir
+          hostPath:
+            path: /dev/net/tun
