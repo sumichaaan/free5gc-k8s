@@ -12,58 +12,34 @@ metadata:
 data:
   AAA_MODE: no-auth
   AUTH_MODE: noauth
-  ANALYTICS_NODES: 10.20.1.16
-  ANALYTICSDB_NODES: 10.20.1.16
-  ANALYTICS_SNMP_NODES: 10.20.1.16
-  ANALYTICS_ALARM_NODES: 10.20.1.16
+  ANALYTICS_NODES: 10.20.1.146,10.20.1.147,10.20.1.148
+  ANALYTICSDB_NODES: 10.20.1.146,10.20.1.147,10.20.1.148
+  ANALYTICS_SNMP_NODES: 10.20.1.146,10.20.1.147,10.20.1.148
+  ANALYTICS_ALARM_NODES: 10.20.1.146,10.20.1.147,10.20.1.148
   ANALYTICSDB_ENABLE: "false"
   ANALYTICS_ALARM_ENABLE: "false"
   ANALYTICS_SNMP_ENABLE: "false"
   CLOUD_ORCHESTRATOR: kubernetes
-  CONFIG_NODES: 10.20.1.16
-  CONFIGDB_NODES: 10.20.1.16
-  CONTROL_NODES: 10.20.1.16
-  CONTROLLER_NODES: 10.20.1.16
+  CONFIG_NODES: 10.20.1.146,10.20.1.147,10.20.1.148
+  CONFIGDB_NODES: 10.20.1.146,10.20.1.147,10.20.1.148
+  CONTROL_NODES: 10.20.1.146,10.20.1.147,10.20.1.148
+  CONTROLLER_NODES: 10.20.1.146,10.20.1.147,10.20.1.148
   # NOTE: Set according to the parameters of kubeadm
   KUBERNETES_POD_SUBNETS: 10.32.0.0/24
-  KUBERNETES_IP_FABRIC_SUBNETS: 10.64.0.0/24
   KUBERNETES_SERVICE_SUBNETS: 10.96.0.0/24
+  KUBERNETES_IP_FABRIC_SUBNETS: 10.64.0.0/24
+  # KUBERNETES_PUBLIC_FIP_POOL: "{}"
+  KUBERNETES_IP_FABRIC_SNAT: "true"
+  KUBERNETES_IP_FABRIC_FORWARDING: "false"
   LOG_LEVEL: SYS_DEBUG
   METADATA_PROXY_SECRET: contrail
   # NOTE: if separated control plane and data plane,
   #       PHYSICAL_INTERFACE and VROUTER_GATEWAY may be changed.
-  PHYSICAL_INTERFACE: eth0
-  VROUTER_GATEWAY: 10.20.1.254
-  RABBITMQ_NODES: 10.20.1.16
+  PHYSICAL_INTERFACE: ens3
+  # VROUTER_GATEWAY: 192.168.31.254
+  RABBITMQ_NODES: 10.20.1.146,10.20.1.147,10.20.1.148
   RABBITMQ_NODE_PORT: "5673"
-  WEBUI_NODES: 10.20.1.16
----
-# Build vRouter with Ubuntu Distribution
-# Should be changed according to the specific version
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: custom-os-version
-  namespace: kube-system
-data:
-  lsb-release: |
-    DISTRIB_ID=Ubuntu
-    DISTRIB_RELEASE=18.04
-    DISTRIB_CODENAME=bionic
-    DISTRIB_DESCRIPTION="Ubuntu 18.04.4 LTS"
-  os-release: |
-    NAME="Ubuntu"
-    VERSION="18.04.4 LTS (Bionic Beaver)"
-    ID=ubuntu
-    ID_LIKE=debian
-    PRETTY_NAME="Ubuntu 18.04.4 LTS"
-    VERSION_ID="18.04"
-    HOME_URL="https://www.ubuntu.com/"
-    SUPPORT_URL="https://help.ubuntu.com/"
-    BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
-    PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
-    VERSION_CODENAME=bionic
-    UBUNTU_CODENAME=bionic
+  WEBUI_NODES: 10.20.1.146,10.20.1.147,10.20.1.148
 ---
 # default params will be set in provisioner environment
 apiVersion: v1
@@ -79,7 +55,7 @@ metadata:
   name: configzookeeperenv
   namespace: kube-system
 data:
-  ZOOKEEPER_NODES: 10.20.1.16
+  ZOOKEEPER_NODES: 10.20.1.146,10.20.1.147,10.20.1.148
   ZOOKEEPER_PORT: "2181"
   ZOOKEEPER_PORTS: "2888:3888"
 ---
@@ -98,7 +74,7 @@ metadata:
   namespace: kube-system
 data:
   JVM_EXTRA_OPTS: -Xms1g -Xmx2g
-  CASSANDRA_SEEDS: 10.20.1.16
+  CASSANDRA_SEEDS: 10.20.1.146,10.20.1.147,10.20.1.148
   CASSANDRA_CLUSTER_NAME: Contrail
   CASSANDRA_START_RPC: "true"
   CASSANDRA_LISTEN_ADDRESS: auto
@@ -115,7 +91,7 @@ metadata:
   namespace: kube-system
 data:
   JVM_EXTRA_OPTS: -Xms1g -Xmx2g
-  CASSANDRA_SEEDS: 10.20.1.16
+  CASSANDRA_SEEDS: 10.20.1.146,10.20.1.147,10.20.1.148
   CASSANDRA_CLUSTER_NAME: ContrailConfigDB
   CASSANDRA_START_RPC: "true"
   CASSANDRA_LISTEN_ADDRESS: auto
@@ -139,7 +115,7 @@ metadata:
   name: kube-manager-config
   namespace: kube-system
 data:
-  KUBERNETES_API_SERVER: 10.20.1.16
+  KUBERNETES_API_SERVER: 10.20.1.149
   KUBERNETES_API_SECURE_PORT: "6443"
   K8S_TOKEN_FILE: "/tmp/serviceaccount/token"
   KUBERNETES_POD_SUBNETS: 10.32.0.0/24
@@ -173,6 +149,9 @@ spec:
                 operator: Exists
       tolerations:
       - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node.kubernetes.io/not-ready
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
@@ -228,6 +207,9 @@ spec:
                 operator: Exists
       tolerations:
       - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node.kubernetes.io/not-ready
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
@@ -377,6 +359,9 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoSchedule
       hostNetwork: true
       containers:
       - name: contrail-configdb
@@ -486,6 +471,9 @@ spec:
                 operator: Exists
       tolerations:
       - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node.kubernetes.io/not-ready
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
@@ -605,6 +593,9 @@ spec:
                 operator: Exists
       tolerations:
       - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node.kubernetes.io/not-ready
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
@@ -741,6 +732,9 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoSchedule
       hostNetwork: true
       initContainers:
       - name: contrail-node-init
@@ -773,7 +767,7 @@ spec:
         - name: NODE_TYPE
           value: analytics-alarm
         - name: KAFKA_NODES
-          value: 10.20.1.16
+          value: 10.20.1.146,10.20.1.147,10.20.1.148
         envFrom:
         - configMapRef:
             name: env
@@ -882,6 +876,9 @@ spec:
                 operator: Exists
       tolerations:
       - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node.kubernetes.io/not-ready
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
@@ -1015,6 +1012,9 @@ spec:
                 operator: Exists
       tolerations:
       - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node.kubernetes.io/not-ready
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
@@ -1167,6 +1167,9 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoSchedule
       hostNetwork: true
       initContainers:
       - name: contrail-node-init
@@ -1242,6 +1245,9 @@ spec:
       - key: node-role.kubernetes.io/master
         operator: Exists
         effect: NoSchedule
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoSchedule
       hostNetwork: true
       containers:
       - name: redis
@@ -1288,6 +1294,9 @@ spec:
                 operator: Exists
       tolerations:
       - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node.kubernetes.io/not-ready
         operator: Exists
         effect: NoSchedule
       hostNetwork: true
@@ -1463,12 +1472,10 @@ spec:
         #   name: network-scripts
         - mountPath: /host/bin
           name: host-bin
-        - mountPath: /etc/os-release
-          name: custom-os-version
-          subPath: os-release
-        - mountPath: /etc/lsb-release
-          name: custom-os-version
-          subPath: lsb-release
+        - mountPath: /host/etc/os-release
+          name: etc
+        - mountPath: /host/etc/lsb-release
+          name: etc
       - name: contrail-kubernetes-cni-init
         image: "tungstenfabric/contrail-kubernetes-cni-init:R2011-latest"
         imagePullPolicy: "IfNotPresent"
@@ -1487,12 +1494,10 @@ spec:
         - mountPath: /var/log/contrail
           name: contrail-logs
         # Check
-        - mountPath: /etc/os-release
-          name: custom-os-version
-          subPath: os-release
-        - mountPath: /etc/lsb-release
-          name: custom-os-version
-          subPath: lsb-release
+        - mountPath: /host/etc/os-release
+          name: etc
+        - mountPath: /host/etc/lsb-release
+          name: etc
       containers:
       - name: contrail-vrouter-agent
         image: "tungstenfabric/contrail-vrouter-agent:R2011-latest"
@@ -1579,6 +1584,9 @@ spec:
       # - name: network-scripts
       #   hostPath:
       #     path: /etc/sysconfig/network-scripts
+      - name: etc
+        hostPath:
+          path: /etc
       - name: host-bin
         hostPath:
           path: /bin
@@ -1618,9 +1626,6 @@ spec:
       - name: lb-nodemgr
         hostPath:
           path: /var/lib/contrail/loadbalancer
-      - name: custom-os-version
-        configMap:
-          name: custom-os-version
 # Meta information section
 ---
 kind: ClusterRole
