@@ -1,0 +1,102 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "free5gc-nrf.fullname" . }}-config
+  labels:
+    {{- include "free5gc-nrf.labels" . | nindent 4 }}
+data:
+  nrfcfg.conf: |
+    info:
+      version: 1.0.0
+      description: NRF initial local configuration
+
+    {{- with .Values.nrfConfiguration }}
+    configuration:
+      MongoDBName: {{ .mongodb.name | default "free5gc" | quote }}
+      MongoDBUrl: "mongodb://{{ .mongodb.url }}:{{ .mongodb.port | default 27017 }}"
+      DefaultServiceIP: {{ .serviceAddr | quote }}
+      sbi:
+        scheme: {{ .sbi.schema | default "http" | quote }}
+        ipv4Addr: {{ .sbi.v4Addr | default "0.0.0.0" | quote }}
+        port: {{ .sbi.port | default 29510 }}
+      DefaultPlmnId:
+        mcc: {{ .plmn.mcc | default 208 }}
+        mnc: {{ .plmn.mnc | default 83 }}
+      serviceNameList:
+        - nnrf-nfm
+        - nnrf-disc
+    {{- end }}
+
+  free5GC.conf: |
+    {{- with .Values.globalConfiguration }}
+    db_uri: "mongodb://{{ .mongodb.url }}:{{ .mongodb.port | default 27017 }}/{{ .mongodb.name | default "free5gc" }}"
+    #all logging levels
+    #panic
+    #fatal
+    #error
+    #warn
+    #info
+    #debug
+    #trace
+    logger:
+    # network function
+      AMF:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      SMF:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      UDR:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      UDM:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      NRF:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      PCF:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      AUSF:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      N3IWF:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+    # library
+      NAS:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      FSM:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      NGAP:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      NamfComm:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      NamfEventExposure:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      NsmfPDUSession:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      NudrDataRepository:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      OpenApi:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      Aper:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      CommonConsumerTest:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+    # webui
+      WEBUI:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+    {{- end }}

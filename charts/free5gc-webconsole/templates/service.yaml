@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "free5gc-webconsole.fullname" . }}
+  labels:
+    {{- include "free5gc-webconsole.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.services.console.type }}
+  ports:
+    - port: {{ .Values.services.console.port }}
+      targetPort: {{ .Values.webconsoleConfiguration.console.port }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "free5gc-webconsole.selectorLabels" . | nindent 4 }}

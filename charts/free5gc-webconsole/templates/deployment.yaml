@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "free5gc-webconsole.fullname" . }}
+  labels:
+    {{- include "free5gc-webconsole.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "free5gc-webconsole.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "free5gc-webconsole.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "free5gc-webconsole.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - name: free5gc-webconsole-config
+              mountPath: {{ .Values.volumeMounts.webconsole.config.mountPath }}
+              readOnly: {{ .Values.volumeMounts.webconsole.config.readOnly }}
+          ports:
+            - name: console
+              containerPort: {{ .Values.webconsoleConfiguration.console.port }}
+              protocol: TCP
+        {{- if .Values.debug }}
+        - name: tcpdump
+          image: dockersec/tcpdump
+          imagePullPolicy: IfNotPresent
+        {{- else }}
+        {{- end }}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: free5gc-webconsole-config
+          configMap:
+            name: {{ include "free5gc-webconsole.fullname" . }}-config

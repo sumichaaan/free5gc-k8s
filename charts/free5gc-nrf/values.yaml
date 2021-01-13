@@ -1,0 +1,80 @@
+# Default values for free5gc-nrf.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/sumichaaan/free5gc-k8s/f5gc-nrf
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "v3.0.4"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsUser: 0
+  runAsGroup: 0
+
+securityContext:
+  privileged: false
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+debug: true
+
+# ingress
+
+services:
+  sbi:
+    type: ClusterIP
+    port: 29510
+
+volumeMounts:
+  nrf:
+    config:
+      mountPath: /free5gc/config
+      readOnly: true
+    cert:
+      mountPath: /free5gc/support/TLS
+      readOnly: true
+
+nrfConfiguration:
+  mongodb:
+    name: free5gc
+    url: free5gc-mongodb
+    port: 27017
+  serviceAddr: free5gc-nrf
+  sbi:
+    scheme: http
+    v4Addr: 0.0.0.0
+    port: 29510
+  plmn:
+    mcc: 208
+    mnc: 83
+
+globalConfiguration:
+  mongodb:
+    name: free5gc
+    url: free5gc-mongodb
+    port: 27017
+  debugLevel: debug

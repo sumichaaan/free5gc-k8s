@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "free5gc-nrf.fullname" . }}-test-connection"
+  labels:
+    {{- include "free5gc-nrf.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "free5gc-nrf.fullname" . }}:{{ .Values.services.sbi.port }}']
+  restartPolicy: Never

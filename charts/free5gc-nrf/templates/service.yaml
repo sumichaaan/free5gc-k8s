@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "free5gc-nrf.fullname" . }}
+  labels:
+    {{- include "free5gc-nrf.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.services.sbi.type | default "ClusterIP" }}
+  ports:
+    - port: {{ .Values.services.sbi.port }}
+      targetPort: {{ .Values.nrfConfiguration.sbi.port }}
+      protocol: TCP
+      name: sbi
+  selector:
+    {{- include "free5gc-nrf.selectorLabels" . | nindent 4 }}
