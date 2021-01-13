@@ -65,6 +65,10 @@ volumeMounts:
       readonly: true
 
 webconsoleConfiguration:
+  mongodb:
+    name: free5gc
+    url: free5gc-mongodb
+    port: 27017
   console:
     scheme: http
     v4Addr: 0.0.0.0
@@ -73,5 +77,7 @@ webconsoleConfiguration:
 globalConfiguration:
   mongodb:
     name: free5gc
-    url: mongodb://free5gc-mongodb:27017
+    url: free5gc-mongodb
+    port: 27017
+  debugLevel: debug
 
