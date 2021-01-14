@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "free5gc-nssf.fullname" . }}
+  name: {{ include "free5gc-pcf.fullname" . }}
   labels:
-    {{- include "free5gc-nssf.labels" . | nindent 4 }}
+    {{- include "free5gc-pcf.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "free5gc-nssf.selectorLabels" . | nindent 6 }}
+      {{- include "free5gc-pcf.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -16,13 +16,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "free5gc-nssf.selectorLabels" . | nindent 8 }}
+        {{- include "free5gc-pcf.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "free5gc-nssf.serviceAccountName" . }}
+      serviceAccountName: {{ include "free5gc-pcf.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -32,15 +32,15 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           volumeMounts:
-            - name: free5gc-nssf-config
-              mountPath: {{ .Values.volumeMounts.nssf.config.mountPath | quote }}
-              readOnly: {{ .Values.volumeMounts.nssf.config.readOnly | default true }}
-            # - name: free5gc-nssf-cert
-            #   mountPath: {{ .Values.volumeMounts.nssf.cert.mountPath | quote }}
-            #   readyOnly: {{ .Values.volumeMounts.nssf.cert.readOnly | default true }}
+            - name: free5gc-pcf-config
+              mountPath: {{ .Values.volumeMounts.pcf.config.mountPath | quote }}
+              readOnly: {{ .Values.volumeMounts.pcf.config.readOnly | default true }}
+            # - name: free5gc-pcf-cert
+            #   mountPath: {{ .Values.volumeMounts.pcf.cert.mountPath | quote }}
+            #   readyOnly: {{ .Values.volumeMounts.pcf.cert.readOnly | default true }}
           ports:
             - name: sbi
-              containerPort: {{ .Values.nssfConfiguration.sbi.port }}
+              containerPort: {{ .Values.pcfConfiguration.sbi.port }}
               protocol: TCP
           # livenessProbe:
           #   httpGet:
@@ -61,6 +61,6 @@ spec:
       schedulerName: default-scheduler
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: free5gc-nssf-config
+        - name: free5gc-pcf-config
           configMap:
-            name: {{ include "free5gc-nssf.fullname" . }}-config
+            name: {{ include "free5gc-pcf.fullname" . }}-config

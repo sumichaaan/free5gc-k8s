@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: free5gc-pcf
+  labels:
+    {{- include "free5gc-pcf.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.services.sbi.type }}
+  ports:
+    - port: {{ .Values.services.sbi.port }}
+      targetPort: {{ .Values.pcfConfiguration.sbi.port }}
+      protocol: TCP
+      name: sbi
+  selector:
+    {{- include "free5gc-pcf.selectorLabels" . | nindent 4 }}
