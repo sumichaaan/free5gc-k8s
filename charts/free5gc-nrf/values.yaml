@@ -40,7 +40,7 @@ tolerations: []
 
 affinity: {}
 
-debug: true
+debug: false
 
 # ingress
 
@@ -63,14 +63,17 @@ nrfConfiguration:
     name: free5gc
     url: free5gc-mongodb
     port: 27017
-  serviceAddr: free5gc-nrf
   sbi:
     scheme: http
-    v4Addr: 0.0.0.0
+    serviceAddr: free5gc-nrf
+    bindingAddr: 0.0.0.0
     port: 29510
-  plmn:
+  defaultPlmn:
     mcc: 208
     mnc: 83
+  supportedServices:
+    - nnrf-nfm
+    - nnrf-disc
 
 globalConfiguration:
   mongodb:

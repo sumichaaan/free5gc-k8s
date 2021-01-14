@@ -1,7 +1,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "free5gc-nrf.fullname" . }}
+  # name: {{ include "free5gc-nrf.fullname" . }}
+  name: free5gc-nrf
   labels:
     {{- include "free5gc-nrf.labels" . | nindent 4 }}
 spec:

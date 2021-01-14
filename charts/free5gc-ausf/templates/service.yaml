@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  # name: {{ include "free5gc-ausf.fullname" . }}
+  name: free5gc-ausf
+  labels:
+    {{- include "free5gc-ausf.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.services.sbi.type | default "ClusterIP" }}
+  ports:
+    - port: {{ .Values.services.sbi.port }}
+      targetPort: {{ .Values.ausfConfiguration.sbi.port }}
+      protocol: TCP
+      name: sbi
+  selector:
+    {{- include "free5gc-ausf.selectorLabels" . | nindent 4 }}

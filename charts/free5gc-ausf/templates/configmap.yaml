@@ -1,31 +1,33 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "free5gc-nrf.fullname" . }}-config
+  name: {{ include "free5gc-ausf.fullname" . }}-config
   labels:
-    {{- include "free5gc-nrf.labels" . | nindent 4 }}
+    {{- include "free5gc-ausf.labels" . | nindent 4 }}
 data:
-  nrfcfg.conf: |
+  ausfcfg.conf: |
     info:
       version: 1.0.0
-      description: NRF initial local configuration
+      description: AUSF initial local configuration
 
-    {{- with .Values.nrfConfiguration }}
+    {{- with .Values.ausfConfiguration }}
     configuration:
-      MongoDBName: {{ .mongodb.name | default "free5gc" | quote }}
-      MongoDBUrl: "mongodb://{{ .mongodb.url }}:{{ .mongodb.port | default 27017 }}"
-      DefaultServiceIP: {{ .sbi.serviceAddr | quote }}
       sbi:
-        scheme: {{ .sbi.schema | default "http" | quote }}
-        ipv4Addr: {{ .sbi.bindingAddr | default "0.0.0.0" | quote }}
-        port: {{ .sbi.port | default 29510 }}
-      DefaultPlmnId:
-        mcc: {{ .defaultPlmn.mcc | default 208 }}
-        mnc: {{ .defaultPlmn.mnc | default 83 }}
+        scheme: {{ .sbi.sheme | default "http" | quote }}
+        registerIPv4: {{ .sbi.serviceAddr | quote }}
+        bindingIPv4: {{ .sbi.bindingAddr | default "0.0.0.0" | quote }}
+        port: {{ .sbi.port | default 29509 }}
       serviceNameList:
       {{- range $key, $svc := .supportedServices }}
         - {{ $svc }}
       {{- end }}
+      nrfUri: {{ .nrf.scheme }}://{{ .nrf.serviceAddr }}:{{ .nrf.port }}
+      plmnSupportList:
+      {{- range $key, $plmn := .supportedPlmns }}
+        - mcc: {{ $plmn.mcc }}
+          mnc: {{ $plmn.mnc }}
+      {{- end }}
+      groupId: {{ .groupId }}
     {{- end }}
 
   free5GC.conf: |
