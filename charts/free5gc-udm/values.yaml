@@ -1,0 +1,84 @@
+# Default values for free5gc-udm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/sumichaaan/free5gc-k8s/f5gc-udm
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "v3.0.4"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsUser: 0
+  runAsGroup: 0
+
+securityContext:
+  privileged: false
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+services:
+  sbi:
+    type: ClusterIP
+    port: 29503
+
+volumeMounts:
+  udm:
+    config:
+      mountPath: /free5gc/config
+      readOnly: true
+    cert:
+      mountPath: /free5gc/support/TLS
+      readOnly: true
+
+pcfConfiguration:
+  sbi:
+    scheme: http
+    serviceAddr: free5gc-pcf
+    bindingAddr: 0.0.0.0
+    port: 29503
+  nrf:
+    scheme: http
+    serviceAddr: free5gc-nrf
+    port: 29510
+  timeFormat: 2019-01-02 12:34:56
+  defaultBdtRef: BdtPolicyId-
+  supportedServices:
+    - name: npcf-am-policy-control
+    - name: npcf-smpolicycontrol
+      suppFeat: 3fff
+    - name: npcf-bdtpolicycontrol
+    - name: npcf-policyauthorization
+      suppFeat: 3
+    - name: npcf-eventexposure
+    - name: npcf-ue-policy-control
+
+globalConfiguration:
+  mongodb:
+    name: free5gc
+    url: free5gc-mongodb
+    port: 27017
+  debugLevel: debug
