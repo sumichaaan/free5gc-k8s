@@ -1,0 +1,375 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "free5gc-nssf.fullname" . }}-config
+  labels:
+    {{- include "free5gc-nssf.labels" . | nindent 4 }}
+data:
+
+  nssfcfg.conf: |
+    info:
+      version: 1.0.0
+      description: NSSF initial local configuration
+
+    {{- with .Values.nssfConfiguration }}
+    configuration:
+      nssfName: NSSF
+      sbi:
+        scheme: {{ .sbi.scheme | default "http" | quote }}
+        registerIPv4: {{ .sbi.serviceAddr | quote }}
+        bindingIPv4: {{ .sbi.bindingAddr | default "0,0,0,0" | quote }}
+        port: {{ .sbi.port | default 29531 }}
+      serviceNameList:
+      {{- range $key, $svc := .supportedServices }}
+        - {{ $svc }}
+      {{- end }}
+      nrfUri: {{ .nrf.scheme }}://{{ .nrf.serviceAddr }}:{{ .nrf.port }}
+      supportedPlmnList:
+      {{- range $key, $plmn := .supportedPlmns }}
+        - mcc: {{ $plmn.mcc }}
+          mnc: {{ $plmn.mnc }}
+      {{- end }}
+      supporetedNssaiInPlmnList:
+      {{- range $key, $nssaisInPlmn := .supportedNssaisInPlmns }}
+        - plmnId:
+            mcc: {{ $nssaisInPlmn.plmn.mcc }}
+            mnc: {{ $nssaisInPlmn.plmn.mnc }}
+          supportedSnssaiList:
+          {{- range $key, $nssai := $nssaisInPlmn.supportedSnssais }}
+            - sst: {{ $nssai.sst }}
+              sd: {{ $nssai.sd }}
+          {{- end }}
+      {{- end }}
+      nsiList:
+      {{- range $key, $nsi := .supportedNsis }}
+        - snssai:
+            sst: {{ $nsi.snssai.sst }}
+            sd: {{ $nsi.snssai.sd }}
+          nsiInformationList:
+          {{- range $key, $nsiInfo := $nsi.nsiInformation }}
+            - nrfId: {{ $nsiInfo.nrf.scheme }}://{{ $nsiInfo.nrf.serviceAddr }}:{{ $nsiInfo.nrf.port }}{{ $nsiInfo.nrf.servicePath }}
+              nsiId: {{ $nsiInfo.nsiIdx }}
+          {{- end }}
+      {{- end }}
+      # The following values does not work currently
+      amfSetList:
+        - amfSetId: 1
+          amfList:
+            - ffa2e8d7-3275-49c7-8631-6af1df1d9d26
+            - 0e8831c3-6286-4689-ab27-1e2161e15cb1
+            - a1fba9ba-2e39-4e22-9c74-f749da571d0d
+          nrfAmfSet: http://localhost:8081/nnrf-nfm/v1/nf-instances
+          supportedNssaiAvailabilityData:
+            - tai:
+                plmnId:
+                  mcc: 466
+                  mnc: 92
+                tac: 33456
+              supportedSnssaiList:
+                - sst: 1
+                  sd: 1
+                - sst: 1
+                  sd: 2
+                - sst: 2
+                  sd: 1
+            - tai:
+                plmnId:
+                  mcc: 466
+                  mnc: 92
+                tac: 33457
+              supportedSnssaiList:
+                - sst: 1
+                - sst: 1
+                  sd: 1
+                - sst: 1
+                  sd: 2
+        - amfSetId: 2
+          nrfAmfSet: http://localhost:8084/nnrf-nfm/v1/nf-instances
+          supportedNssaiAvailabilityData:
+            - tai:
+                plmnId:
+                  mcc: 466
+                  mnc: 92
+                tac: 33456
+              supportedSnssaiList:
+                - sst: 1
+                - sst: 1
+                  sd: 1
+                - sst: 1
+                  sd: 3
+                - sst: 2
+                  sd: 1
+            - tai:
+                plmnId:
+                  mcc: 466
+                  mnc: 92
+                tac: 33458
+              supportedSnssaiList:
+                - sst: 1
+                - sst: 1
+                  sd: 1
+                - sst: 2
+      amfList:
+        - nfId: 469de254-2fe5-4ca0-8381-af3f500af77c
+          supportedNssaiAvailabilityData:
+            - tai:
+                plmnId:
+                  mcc: 466
+                  mnc: 92
+                tac: 33456
+              supportedSnssaiList:
+                - sst: 1
+                - sst: 1
+                  sd: 2
+                - sst: 2
+            - tai:
+                plmnId:
+                  mcc: 466
+                  mnc: 92
+                tac: 33457
+              supportedSnssaiList:
+                - sst: 1
+                  sd: 1
+                - sst: 1
+                  sd: 2
+        - nfId: fbe604a8-27b2-417e-bd7c-8a7be2691f8d
+          supportedNssaiAvailabilityData:
+            - tai:
+                plmnId:
+                  mcc: 466
+                  mnc: 92
+                tac: 33458
+              supportedSnssaiList:
+                - sst: 1
+                - sst: 1
+                  sd: 1
+                - sst: 1
+                  sd: 3
+                - sst: 2
+            - tai:
+                plmnId:
+                  mcc: 466
+                  mnc: 92
+                tac: 33459
+              supportedSnssaiList:
+                - sst: 1
+                - sst: 1
+                  sd: 1
+                - sst: 2
+                - sst: 2
+                  sd: 1
+        - nfId: b9e6e2cb-5ce8-4cb6-9173-a266dd9a2f0c
+          supportedNssaiAvailabilityData:
+            - tai:
+                plmnId:
+                  mcc: 466
+                  mnc: 92
+                tac: 33456
+              supportedSnssaiList:
+                - sst: 1
+                - sst: 1
+                  sd: 1
+                - sst: 1
+                  sd: 2
+                - sst: 2
+            - tai:
+                plmnId:
+                  mcc: 466
+                  mnc: 92
+                tac: 33458
+              supportedSnssaiList:
+                - sst: 1
+                - sst: 1
+                  sd: 1
+                - sst: 2
+                - sst: 2
+                  sd: 1
+      taList:
+        - tai:
+            plmnId:
+              mcc: 466
+              mnc: 92
+            tac: 33456
+          accessType: 3GPP_ACCESS
+          supportedSnssaiList:
+            - sst: 1
+            - sst: 1
+              sd: 1
+            - sst: 1
+              sd: 2
+            - sst: 2
+        - tai:
+            plmnId:
+              mcc: 466
+              mnc: 92
+            tac: 33457
+          accessType: 3GPP_ACCESS
+          supportedSnssaiList:
+            - sst: 1
+            - sst: 1
+              sd: 1
+            - sst: 1
+              sd: 2
+            - sst: 2
+        - tai:
+            plmnId:
+              mcc: 466
+              mnc: 92
+            tac: 33458
+          accessType: 3GPP_ACCESS
+          supportedSnssaiList:
+            - sst: 1
+            - sst: 1
+              sd: 1
+            - sst: 1
+              sd: 3
+            - sst: 2
+          restrictedSnssaiList:
+            - homePlmnId:
+                mcc: 310
+                mnc: 560
+              sNssaiList:
+                - sst: 1
+                  sd: 3
+        - tai:
+            plmnId:
+              mcc: 466
+              mnc: 92
+            tac: 33459
+          accessType: 3GPP_ACCESS
+          supportedSnssaiList:
+            - sst: 1
+            - sst: 1
+              sd: 1
+            - sst: 2
+            - sst: 2
+              sd: 1
+          restrictedSnssaiList:
+            - homePlmnId:
+                mcc: 310
+                mnc: 560
+              sNssaiList:
+                - sst: 2
+                  sd: 1
+      mappingListFromPlmn:
+        - operatorName: NTT Docomo
+          homePlmnId:
+            mcc: 440
+            mnc: 10
+          mappingOfSnssai:
+            - servingSnssai:
+                sst: 1
+                sd: 1
+              homeSnssai:
+                sst: 1
+                sd: 1
+            - servingSnssai:
+                sst: 1
+                sd: 2
+              homeSnssai:
+                sst: 1
+                sd: 3
+            - servingSnssai:
+                sst: 1
+                sd: 3
+              homeSnssai:
+                sst: 1
+                sd: 4
+            - servingSnssai:
+                sst: 2
+                sd: 1
+              homeSnssai:
+                sst: 2
+                sd: 2
+        - operatorName: AT&T Mobility
+          homePlmnId:
+            mcc: 310
+            mnc: 560
+          mappingOfSnssai:
+            - servingSnssai:
+                sst: 1
+                sd: 1
+              homeSnssai:
+                sst: 1
+                sd: 2
+            - servingSnssai:
+                sst: 1
+                sd: 2
+              homeSnssai:
+                sst: 1
+                sd: 3
+    {{- end }}
+
+  free5GC.conf: |
+    {{- with .Values.globalConfiguration }}
+    db_uri: "mongodb://{{ .mongodb.url }}:{{ .mongodb.port | default 27017 }}/{{ .mongodb.name | default "free5gc" }}"
+    #all logging levels
+    #panic
+    #fatal
+    #error
+    #warn
+    #info
+    #debug
+    #trace
+    logger:
+    # network function
+      AMF:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      SMF:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      UDR:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      UDM:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      NRF:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      PCF:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      AUSF:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      N3IWF:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+    # library
+      NAS:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      FSM:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      NGAP:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      NamfComm:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      NamfEventExposure:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      NsmfPDUSession:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      NudrDataRepository:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      OpenApi:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      Aper:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+      CommonConsumerTest:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+    # webui
+      WEBUI:
+        debugLevel: {{ .debugLevel | default "info" }}
+        ReportCaller: true
+    {{- end }}

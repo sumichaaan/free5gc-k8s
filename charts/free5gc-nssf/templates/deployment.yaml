@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "free5gc-nssf.fullname" . }}
+  labels:
+    {{- include "free5gc-nssf.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "free5gc-nssf.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "free5gc-nssf.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "free5gc-nssf.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - name: free5gc-nssf-config
+              mountPath: {{ .Values.volumeMounts.nssf.config.mountPath | quote }}
+              readOnly: {{ .Values.volumeMounts.nssf.config.readOnly | default true }}
+            # - name: free5gc-nssf-cert
+            #   mountPath: {{ .Values.volumeMounts.nssf.cert.mountPath | quote }}
+            #   readyOnly: {{ .Values.volumeMounts.nssf.cert.readOnly | default true }}
+          ports:
+            - name: sbi
+              containerPort: {{ .Values.nssfConfiguration.sbi.port }}
+              protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+        {{- if .Values.debug }}
+        - name: tcpdump
+          image: dockersec/tcpdump
+          imagePullPolicy: IfNotPresent
+        {{- else }}
+        {{- end }}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: free5gc-nssf-config
+          configMap:
+            name: {{ include "free5gc-nssf.fullname" . }}-config

@@ -71,7 +71,7 @@ webconsoleConfiguration:
     port: 27017
   console:
     scheme: http
-    v4Addr: 0.0.0.0
+    bindingAddr: 0.0.0.0
     port: 5000
 
 globalConfiguration:
